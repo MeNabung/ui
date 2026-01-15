@@ -521,21 +521,21 @@ export default function DashboardPage() {
       {/* Animated Header */}
       <Header />
 
-      <main className="max-w-6xl mx-auto px-4 py-8 pt-24">
+      <main className="max-w-6xl mx-auto px-3 sm:px-4 py-6 sm:py-8 pt-28 sm:pt-24">
         {/* Welcome Section */}
-        <FadeUp className="mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <FadeUp className="mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
             <div>
-              <h1 className="font-display text-2xl font-bold text-teal text-balance">
+              <h1 className="font-display text-xl sm:text-2xl font-bold text-teal text-balance">
                 Portfolio Overview
               </h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                Track your IDRX investments and garden growth
+              <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+                Track IDRX growth
               </p>
             </div>
-            <div className="text-right">
-              <p className="text-sm text-muted-foreground mb-1">Native Balance</p>
-              <p className="text-lg font-semibold text-foreground tabular-nums">
+            <div className="text-left sm:text-right">
+              <p className="text-xs sm:text-sm text-muted-foreground mb-0.5">Balance</p>
+              <p className="text-base sm:text-lg font-semibold text-foreground tabular-nums">
                 {balance
                   ? `${parseFloat(balance.formatted).toFixed(4)} ${balance.symbol}`
                   : 'Loading...'}
@@ -545,23 +545,23 @@ export default function DashboardPage() {
         </FadeUp>
 
         {/* Main Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           {/* Portfolio Overview Card */}
           <FadeUp className="lg:col-span-2">
             <Card>
-              <CardHeader>
-                <CardTitle className="font-display text-xl text-teal">
-                  Total Portfolio Value
+              <CardHeader className="px-4 sm:px-6 pb-2 sm:pb-4">
+                <CardTitle className="font-display text-lg sm:text-xl text-teal">
+                  Total Portfolio
                 </CardTitle>
-                <CardDescription>Your IDRX holdings across all strategies</CardDescription>
+                <CardDescription className="text-xs sm:text-sm">IDRX across all strategies</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+              <CardContent className="px-4 sm:px-6">
+                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
                   <div>
-                    <p className="text-4xl font-bold text-teal tabular-nums">
+                    <p className="text-2xl sm:text-4xl font-bold text-teal tabular-nums">
                       <AnimatedNumber value={PORTFOLIO_DATA.totalValue} duration={1.2} />
                     </p>
-                    <p className="text-muted-foreground">IDRX</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">IDRX</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <motion.div
@@ -600,27 +600,25 @@ export default function DashboardPage() {
           {/* Garden Growth Visualization */}
           <FadeUp>
             <Card>
-              <CardHeader>
-                <CardTitle className="font-display text-lg text-teal">
+              <CardHeader className="px-4 sm:px-6 pb-2 sm:pb-4">
+                <CardTitle className="font-display text-base sm:text-lg text-teal">
                   Garden Growth
                 </CardTitle>
-                <CardDescription>Stage {growthStage} of 5</CardDescription>
+                <CardDescription className="text-xs sm:text-sm">Stage {growthStage}/5</CardDescription>
               </CardHeader>
-              <CardContent className="flex flex-col items-center justify-center">
+              <CardContent className="flex flex-col items-center justify-center px-4 sm:px-6">
                 <FloatingElement delay={0.5}>
-                  <div className="w-full aspect-square max-w-[200px] flex items-center justify-center">
+                  <div className="w-full aspect-square max-w-[160px] sm:max-w-[200px] flex items-center justify-center">
                     <GardenPlant stage={growthStage} />
                   </div>
                 </FloatingElement>
                 <motion.p
-                  className="text-sm text-muted-foreground text-center mt-4"
+                  className="text-xs sm:text-sm text-muted-foreground text-center mt-3 sm:mt-4"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.8 }}
                 >
-                  {growthStage < 5
-                    ? 'Keep growing your portfolio to reach the next stage'
-                    : 'Your garden is flourishing'}
+                  {growthStage < 5 ? 'Keep growing!' : 'Flourishing'}
                 </motion.p>
               </CardContent>
             </Card>
@@ -628,36 +626,36 @@ export default function DashboardPage() {
         </div>
 
         {/* Strategy Cards with Stagger */}
-        <StaggerContainer className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+        <StaggerContainer className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 mb-6 sm:mb-8">
           {PORTFOLIO_DATA.strategies.map((strategy) => (
             <AnimatedCard key={strategy.id}>
               <Card className="h-full">
-                <CardHeader className="pb-4">
+                <CardHeader className="pb-2 sm:pb-4 px-3 sm:px-6">
                   <div className="flex items-center justify-between">
                     <motion.div
-                      className="w-10 h-10 rounded-lg bg-cream-dark flex items-center justify-center text-teal"
+                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-cream-dark flex items-center justify-center text-teal"
                       whileHover={{ rotate: 5 }}
                       transition={{ duration: 0.2 }}
                     >
                       <StrategyIcon type={strategy.id} />
                     </motion.div>
-                    <Badge variant="outline" className="text-teal border-teal">
+                    <Badge variant="outline" className="text-teal border-teal text-[10px] sm:text-xs">
                       {strategy.status}
                     </Badge>
                   </div>
-                  <CardTitle className="font-display text-base text-foreground mt-3">
+                  <CardTitle className="font-display text-sm sm:text-base text-foreground mt-2 sm:mt-3">
                     {strategy.name}
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-bold text-teal tabular-nums">
+                <CardContent className="px-3 sm:px-6">
+                  <p className="text-xl sm:text-2xl font-bold text-teal tabular-nums">
                     <AnimatedNumber value={strategy.value} duration={1} />
                   </p>
-                  <p className="text-sm text-muted-foreground">IDRX</p>
-                  <div className="mt-4 pt-4 border-t border-border">
+                  <p className="text-xs sm:text-sm text-muted-foreground">IDRX</p>
+                  <div className="mt-3 pt-3 sm:mt-4 sm:pt-4 border-t border-border">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">APY</span>
-                      <span className="text-sm font-semibold text-gold tabular-nums">
+                      <span className="text-xs sm:text-sm text-muted-foreground">APY</span>
+                      <span className="text-xs sm:text-sm font-semibold text-gold tabular-nums">
                         {strategy.apy}%
                       </span>
                     </div>
@@ -669,26 +667,26 @@ export default function DashboardPage() {
         </StaggerContainer>
 
         {/* Quick Actions and Recent Activity */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Quick Actions */}
           <FadeUp className="lg:col-span-1">
             <Card>
-              <CardHeader>
-                <CardTitle className="font-display text-lg text-teal">
+              <CardHeader className="px-3 sm:px-6 pb-2 sm:pb-4">
+                <CardTitle className="font-display text-base sm:text-lg text-teal">
                   Quick Actions
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-2 sm:space-y-3 px-3 sm:px-6">
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  <Button className="w-full justify-start gap-3 bg-teal hover:bg-teal-light transition-colors">
+                  <Button className="w-full justify-start gap-2 sm:gap-3 bg-teal hover:bg-teal-light transition-colors text-sm">
                     <DepositIcon />
-                    Deposit IDRX
+                    Deposit
                   </Button>
                 </motion.div>
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <Button
                     variant="outline"
-                    className="w-full justify-start gap-3 text-teal border-teal hover:bg-cream-dark transition-colors"
+                    className="w-full justify-start gap-2 sm:gap-3 text-teal border-teal hover:bg-cream-dark transition-colors text-sm"
                   >
                     <WithdrawIcon />
                     Withdraw
@@ -697,10 +695,10 @@ export default function DashboardPage() {
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <Button
                     variant="outline"
-                    className="w-full justify-start gap-3 text-teal border-teal hover:bg-cream-dark transition-colors"
+                    className="w-full justify-start gap-2 sm:gap-3 text-teal border-teal hover:bg-cream-dark transition-colors text-sm"
                   >
                     <RebalanceIcon />
-                    Rebalance Portfolio
+                    Rebalance
                   </Button>
                 </motion.div>
               </CardContent>
@@ -710,26 +708,26 @@ export default function DashboardPage() {
           {/* Recent Activity */}
           <FadeUp className="lg:col-span-2">
             <Card>
-              <CardHeader>
-                <CardTitle className="font-display text-lg text-teal">
+              <CardHeader className="px-3 sm:px-6 pb-2 sm:pb-4">
+                <CardTitle className="font-display text-base sm:text-lg text-teal">
                   Recent Activity
                 </CardTitle>
-                <CardDescription>Your latest transactions and yields</CardDescription>
+                <CardDescription className="text-xs sm:text-sm">Latest transactions</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
+              <CardContent className="px-3 sm:px-6">
+                <div className="space-y-2 sm:space-y-4">
                   {PORTFOLIO_DATA.recentActivity.map((activity, index) => (
                     <motion.div
                       key={activity.id}
-                      className="flex items-center justify-between py-3 border-b border-border last:border-0"
+                      className="flex items-center justify-between py-2 sm:py-3 border-b border-border last:border-0"
                       initial={{ opacity: 0, x: -10 }}
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: index * 0.1, duration: 0.3 }}
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2 sm:gap-3">
                         <motion.div
-                          className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                          className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center ${
                             activity.type === 'deposit'
                               ? 'bg-teal/10 text-teal'
                               : activity.type === 'yield'
@@ -742,10 +740,10 @@ export default function DashboardPage() {
                           <ActivityIcon type={activity.type} />
                         </motion.div>
                         <div>
-                          <p className="text-sm font-medium text-foreground capitalize">
+                          <p className="text-xs sm:text-sm font-medium text-foreground capitalize">
                             {activity.type}
                           </p>
-                          <p className="text-xs text-muted-foreground">
+                          <p className="text-[10px] sm:text-xs text-muted-foreground">
                             {activity.strategy}
                           </p>
                         </div>
@@ -753,15 +751,15 @@ export default function DashboardPage() {
                       <div className="text-right">
                         {activity.amount > 0 && (
                           <p
-                            className={`text-sm font-semibold tabular-nums ${
+                            className={`text-xs sm:text-sm font-semibold tabular-nums ${
                               activity.type === 'yield' ? 'text-gold' : 'text-foreground'
                             }`}
                           >
                             {activity.type === 'yield' ? '+' : ''}
-                            {formatIDRX(activity.amount)} IDRX
+                            {formatIDRX(activity.amount)}
                           </p>
                         )}
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-[10px] sm:text-xs text-muted-foreground">
                           {formatDate(activity.timestamp)}
                         </p>
                       </div>

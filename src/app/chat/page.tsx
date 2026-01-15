@@ -186,11 +186,12 @@ export default function ChatPage() {
       {/* Animated Header */}
       <Header />
 
-      {/* Spacer for fixed header */}
-      <div className="h-16" />
+      {/* Spacer for fixed header - responsive for mobile nav */}
+      <div className="h-14 sm:h-16" />
+      {isConnected && <div className="h-12 md:hidden" />}
 
       {/* Main chat area */}
-      <div className="flex-1 overflow-hidden flex flex-col max-w-3xl mx-auto w-full">
+      <div className="flex-1 overflow-hidden flex flex-col max-w-3xl mx-auto w-full px-0 sm:px-4">
         {/* Risk profile indicator */}
         <AnimatePresence>
           {lastRiskLevel && (
@@ -217,7 +218,7 @@ export default function ChatPage() {
         </AnimatePresence>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6 scroll-smooth">
+        <div className="flex-1 overflow-y-auto px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6 scroll-smooth">
           <AnimatePresence mode="popLayout">
             {messages.map((message, index) => (
               <motion.div
@@ -230,11 +231,12 @@ export default function ChatPage() {
                 className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 {message.role === 'assistant' && (
-                  <div className="flex gap-3 max-w-[85%]">
+                  <div className="flex gap-2 sm:gap-3 max-w-[92%] sm:max-w-[85%]">
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ delay: 0.1, duration: 0.2, ease: 'easeOut' }}
+                      className="hidden sm:block"
                     >
                       <UIAvatar className="w-8 h-8 flex-shrink-0 mt-1">
                         <AvatarFallback className="bg-teal text-white text-xs font-medium">
@@ -244,7 +246,7 @@ export default function ChatPage() {
                     </motion.div>
                     <div className="flex flex-col gap-1">
                       <Card className="shadow-card border-0 py-0">
-                        <CardContent className="p-4">
+                        <CardContent className="p-3 sm:p-4">
                           <p className="text-sm text-pretty leading-relaxed text-foreground whitespace-pre-wrap">
                             {message.content}
                           </p>
@@ -263,12 +265,12 @@ export default function ChatPage() {
                 )}
 
                 {message.role === 'user' && (
-                  <div className="flex flex-col items-end gap-1 max-w-[85%]">
+                  <div className="flex flex-col items-end gap-1 max-w-[92%] sm:max-w-[85%]">
                     <motion.div
                       initial={{ scale: 0.95 }}
                       animate={{ scale: 1 }}
                       transition={{ duration: 0.15 }}
-                      className="bg-teal text-white rounded-2xl rounded-br-md px-4 py-3"
+                      className="bg-teal text-white rounded-2xl rounded-br-md px-3 sm:px-4 py-2.5 sm:py-3"
                     >
                       <p className="text-sm text-pretty leading-relaxed whitespace-pre-wrap">
                         {message.content}
@@ -296,12 +298,13 @@ export default function ChatPage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.2 }}
-                className="flex gap-3"
+                className="flex gap-2 sm:gap-3"
               >
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ duration: 0.2 }}
+                  className="hidden sm:block"
                 >
                   <UIAvatar className="w-8 h-8 flex-shrink-0">
                     <AvatarFallback className="bg-teal text-white text-xs font-medium">
@@ -340,12 +343,13 @@ export default function ChatPage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.4, ease: 'easeOut' }}
-                className="flex gap-3"
+                className="flex gap-2 sm:gap-3"
               >
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.1, duration: 0.2 }}
+                  className="hidden sm:block"
                 >
                   <UIAvatar className="w-8 h-8 flex-shrink-0 mt-1">
                     <AvatarFallback className="bg-gold text-white text-xs font-medium">
@@ -353,17 +357,17 @@ export default function ChatPage() {
                     </AvatarFallback>
                   </UIAvatar>
                 </motion.div>
-                <Card className="shadow-card border-0 py-0 flex-1 max-w-[85%]">
-                  <CardContent className="p-4">
+                <Card className="shadow-card border-0 py-0 flex-1 max-w-full sm:max-w-[85%]">
+                  <CardContent className="p-3 sm:p-4">
                     <motion.h4
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.15 }}
-                      className="font-display font-semibold text-sm text-teal mb-4 text-balance"
+                      className="font-display font-semibold text-sm text-teal mb-3 sm:mb-4 text-balance"
                     >
-                      Strategy Allocation Recommendation
+                      Strategy Allocation
                     </motion.h4>
-                    <div className="space-y-3">
+                    <div className="space-y-2 sm:space-y-3">
                       {/* Options */}
                       <motion.div
                         custom={0}
@@ -371,7 +375,7 @@ export default function ChatPage() {
                         initial="hidden"
                         animate="visible"
                         whileHover={{ scale: 1.01, transition: { duration: 0.15 } }}
-                        className="flex items-center justify-between p-3 bg-cream rounded-lg cursor-pointer transition-shadow hover:shadow-sm"
+                        className="flex items-center justify-between p-2.5 sm:p-3 bg-cream rounded-lg cursor-pointer transition-shadow hover:shadow-sm"
                       >
                         <div className="flex-1">
                           <p className="text-sm font-medium text-foreground">
@@ -400,7 +404,7 @@ export default function ChatPage() {
                         initial="hidden"
                         animate="visible"
                         whileHover={{ scale: 1.01, transition: { duration: 0.15 } }}
-                        className="flex items-center justify-between p-3 bg-cream rounded-lg cursor-pointer transition-shadow hover:shadow-sm"
+                        className="flex items-center justify-between p-2.5 sm:p-3 bg-cream rounded-lg cursor-pointer transition-shadow hover:shadow-sm"
                       >
                         <div className="flex-1">
                           <p className="text-sm font-medium text-foreground">
@@ -429,7 +433,7 @@ export default function ChatPage() {
                         initial="hidden"
                         animate="visible"
                         whileHover={{ scale: 1.01, transition: { duration: 0.15 } }}
-                        className="flex items-center justify-between p-3 bg-cream rounded-lg cursor-pointer transition-shadow hover:shadow-sm"
+                        className="flex items-center justify-between p-2.5 sm:p-3 bg-cream rounded-lg cursor-pointer transition-shadow hover:shadow-sm"
                       >
                         <div className="flex-1">
                           <p className="text-sm font-medium text-foreground">
@@ -487,15 +491,15 @@ export default function ChatPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 8 }}
               transition={{ duration: 0.2 }}
-              className="px-4 pb-3 border-t border-border bg-white pt-3"
+              className="px-3 sm:px-4 pb-3 border-t border-border bg-white pt-3"
             >
               <p className="text-xs text-muted-foreground mb-2">Quick actions:</p>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5 sm:gap-2">
                 {[
-                  { text: 'Beginner, safe investment', action: 'I\'m a beginner and want to invest safely' },
-                  { text: 'Diversify 5M IDRX', action: 'I have 5 million IDRX to diversify' },
-                  { text: 'Experienced, high return', action: 'I\'m experienced and want to maximize returns' },
-                  { text: 'About Thetanuts Options', action: 'Explain the Thetanuts Options strategy' },
+                  { text: 'Safe investment', action: 'I\'m a beginner and want to invest safely' },
+                  { text: '5M IDRX', action: 'I have 5 million IDRX to diversify' },
+                  { text: 'High returns', action: 'I\'m experienced and want to maximize returns' },
+                  { text: 'Thetanuts?', action: 'Explain the Thetanuts Options strategy' },
                 ].map((item, index) => (
                   <motion.div
                     key={item.text}
@@ -525,9 +529,9 @@ export default function ChatPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
-          className="border-t border-border bg-white p-4 safe-bottom"
+          className="border-t border-border bg-white p-3 sm:p-4 safe-bottom"
         >
-          <form onSubmit={handleSubmit} className="flex gap-3">
+          <form onSubmit={handleSubmit} className="flex gap-2 sm:gap-3">
             <motion.div
               className="flex-1 relative"
               animate={{
@@ -542,8 +546,8 @@ export default function ChatPage() {
                 onChange={(e) => setInput(e.target.value)}
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
-                placeholder="Discuss your financial goals or investment strategy..."
-                className={`pr-4 py-5 bg-cream border-border transition-all duration-150 ${
+                placeholder="What are your goals?"
+                className={`pr-4 py-5 bg-cream border-border transition-all duration-150 text-base ${
                   isFocused ? 'ring-2 ring-teal/20 border-teal' : ''
                 }`}
                 disabled={isLoading}
@@ -571,7 +575,7 @@ export default function ChatPage() {
               <Button
                 type="submit"
                 disabled={isLoading || !input.trim()}
-                className="bg-teal hover:bg-teal-light text-white px-6 transition-all duration-150"
+                className="bg-teal hover:bg-teal-light text-white px-4 sm:px-6 transition-all duration-150"
               >
                 {isLoading ? (
                   <motion.span
@@ -590,9 +594,9 @@ export default function ChatPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className="text-xs text-muted-foreground mt-4 text-center text-pretty"
+            className="text-[10px] sm:text-xs text-muted-foreground mt-3 sm:mt-4 text-center text-pretty"
           >
-            AI recommendations are informational only. Always do your own research before investing.
+            Not financial advice. DYOR.
           </motion.p>
         </motion.div>
       </div>

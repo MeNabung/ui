@@ -114,35 +114,35 @@ export default function QuizPage() {
     return (
       <main className="min-h-dvh bg-cream">
         <Header />
-        <div className="h-16" /> {/* Spacer for fixed header */}
+        <div className="h-14 sm:h-16" /> {/* Spacer for fixed header */}
 
-        <div className="max-w-2xl mx-auto px-4 py-12">
+        <div className="max-w-2xl mx-auto px-3 sm:px-4 py-8 sm:py-12">
           <FadeUp>
             <Card className="shadow-card">
-              <CardHeader className="text-center pb-4">
+              <CardHeader className="text-center pb-2 sm:pb-4 px-4 sm:px-6">
                 <motion.div
                   initial={{ scale: 0, rotate: -180 }}
                   animate={{ scale: 1, rotate: 0 }}
                   transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.2 }}
-                  className="mx-auto mb-4"
+                  className="mx-auto mb-3 sm:mb-4"
                 >
                   <ProfileIcon profile={result} />
                 </motion.div>
-                <CardTitle className="font-display text-2xl text-balance">
+                <CardTitle className="font-display text-xl sm:text-2xl text-balance">
                   Your Risk Profile
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-4 sm:space-y-6 px-4 sm:px-6">
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
                   className="text-center"
                 >
-                  <h2 className={cn('font-display text-3xl font-semibold mb-2', profile.color)}>
+                  <h2 className={cn('font-display text-2xl sm:text-3xl font-semibold mb-2', profile.color)}>
                     {profile.name}
                   </h2>
-                  <p className="text-muted-foreground text-pretty">
+                  <p className="text-sm sm:text-base text-muted-foreground text-pretty">
                     {profile.description}
                   </p>
                 </motion.div>
@@ -152,7 +152,7 @@ export default function QuizPage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
-                  className="bg-cream-dark rounded-lg p-6 space-y-4"
+                  className="bg-cream-dark rounded-lg p-4 sm:p-6 space-y-3 sm:space-y-4"
                 >
                   <h3 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">
                     Recommended Allocation
@@ -184,14 +184,14 @@ export default function QuizPage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.8 }}
-                  className="flex flex-col gap-3 pt-4"
+                  className="flex flex-col gap-2 sm:gap-3 pt-3 sm:pt-4"
                 >
                   <AnimatedButton>
                     <Button
                       onClick={handleStartChat}
-                      className="w-full bg-teal hover:bg-teal-light text-white h-12 font-medium"
+                      className="w-full bg-teal hover:bg-teal-light text-white h-11 sm:h-12 font-medium text-sm sm:text-base"
                     >
-                      Continue to AI Advisor
+                      Continue to AI
                       <ArrowRightIcon className="ml-2 size-4" />
                     </Button>
                   </AnimatedButton>
@@ -203,9 +203,9 @@ export default function QuizPage() {
                         setAnswers([]);
                         setResult(null);
                       }}
-                      className="w-full h-12"
+                      className="w-full h-11 sm:h-12 text-sm sm:text-base"
                     >
-                      Retake Quiz
+                      Retake
                     </Button>
                   </AnimatedButton>
                 </motion.div>
@@ -222,21 +222,21 @@ export default function QuizPage() {
   return (
     <main className="min-h-dvh bg-cream">
       <Header />
-      <div className="h-16" /> {/* Spacer for fixed header */}
+      <div className="h-14 sm:h-16" /> {/* Spacer for fixed header */}
 
-      <div className="max-w-2xl mx-auto px-4 py-8">
+      <div className="max-w-2xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
         {/* Progress */}
         <FadeUp>
-          <div className="mb-4 flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">
-              Question {currentQuestion + 1} of {questions.length}
+          <div className="mb-3 sm:mb-4 flex items-center justify-between">
+            <span className="text-xs sm:text-sm text-muted-foreground">
+              {currentQuestion + 1} / {questions.length}
             </span>
-            <span className="text-sm font-medium text-teal tabular-nums">
+            <span className="text-xs sm:text-sm font-medium text-teal tabular-nums">
               {Math.round(progress)}%
             </span>
           </div>
-          <div className="mb-8">
-            <div className="h-2 bg-cream-dark rounded-full overflow-hidden">
+          <div className="mb-6 sm:mb-8">
+            <div className="h-1.5 sm:h-2 bg-cream-dark rounded-full overflow-hidden">
               <motion.div
                 className="h-full bg-teal rounded-full"
                 initial={{ width: 0 }}
@@ -256,12 +256,12 @@ export default function QuizPage() {
             transition={{ duration: 0.3 }}
           >
             <Card className="shadow-card">
-              <CardHeader>
-                <CardTitle className="font-display text-xl text-balance leading-relaxed">
+              <CardHeader className="px-4 sm:px-6 pb-3 sm:pb-4">
+                <CardTitle className="font-display text-lg sm:text-xl text-balance leading-relaxed">
                   {question.question}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-2 sm:space-y-3 px-4 sm:px-6">
                 {question.options.map((option, index) => (
                   <motion.button
                     key={index}
@@ -272,13 +272,14 @@ export default function QuizPage() {
                     whileTap={{ scale: 0.99 }}
                     onClick={() => handleAnswer(option.value)}
                     className={cn(
-                      'w-full text-left p-4 rounded-lg border-2 border-border',
+                      'w-full text-left p-3 sm:p-4 rounded-lg border-2 border-border',
                       'hover:border-teal hover:bg-cream-dark',
+                      'active:bg-cream-dark',
                       'transition-colors duration-150',
                       'focus:outline-none focus:ring-2 focus:ring-teal focus:ring-offset-2'
                     )}
                   >
-                    <span className="text-pretty">{option.text}</span>
+                    <span className="text-sm sm:text-base text-pretty">{option.text}</span>
                   </motion.button>
                 ))}
               </CardContent>
@@ -291,13 +292,13 @@ export default function QuizPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="mt-6 text-center"
+          className="mt-5 sm:mt-6 text-center"
         >
           <Link
             href="/chat"
-            className="text-sm text-muted-foreground hover:text-teal transition-colors"
+            className="text-xs sm:text-sm text-muted-foreground hover:text-teal transition-colors"
           >
-            Skip quiz, chat with AI directly
+            Skip quiz
           </Link>
         </motion.div>
       </div>
