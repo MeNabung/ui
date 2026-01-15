@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
@@ -8,7 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Header } from '@/components/Header';
+import { RequireWallet } from '@/components/RequireWallet';
 import { FadeUp, AnimatedCard, AnimatedButton } from '@/components/motion';
+import { useGamification } from '@/lib/gamification';
 import { cn } from '@/lib/utils';
 
 interface Question {
@@ -73,11 +75,19 @@ const riskProfiles = {
 
 export default function QuizPage() {
   const router = useRouter();
+  const { completeMission } = useGamification();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
   const [result, setResult] = useState<'conservative' | 'balanced' | 'aggressive' | null>(null);
 
   const progress = ((currentQuestion) / questions.length) * 100;
+
+  // Complete mission when quiz is finished
+  useEffect(() => {
+    if (result) {
+      completeMission('know_yourself');
+    }
+  }, [result, completeMission]);
 
   const handleAnswer = (value: 'conservative' | 'balanced' | 'aggressive') => {
     const newAnswers = [...answers, value];
@@ -112,6 +122,7 @@ export default function QuizPage() {
   if (result) {
     const profile = riskProfiles[result];
     return (
+      <RequireWallet>
       <main className="min-h-dvh bg-cream">
         <Header />
         <div className="h-14 sm:h-16" /> {/* Spacer for fixed header */}
@@ -214,12 +225,14 @@ export default function QuizPage() {
           </FadeUp>
         </div>
       </main>
+      </RequireWallet>
     );
   }
 
   const question = questions[currentQuestion];
 
   return (
+    <RequireWallet>
     <main className="min-h-dvh bg-cream">
       <Header />
       <div className="h-14 sm:h-16" /> {/* Spacer for fixed header */}
@@ -303,6 +316,7 @@ export default function QuizPage() {
         </motion.div>
       </div>
     </main>
+    </RequireWallet>
   );
 }
 

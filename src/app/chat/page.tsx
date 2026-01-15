@@ -9,6 +9,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Avatar as UIAvatar, AvatarFallback } from '@/components/ui/avatar';
 import { Header } from '@/components/Header';
+import { RequireWallet } from '@/components/RequireWallet';
+import { useGamification } from '@/lib/gamification';
 import { motion, AnimatePresence } from 'motion/react';
 import type { ChatMessage, AIResponse, StrategyAllocation, RiskLevel } from '@/lib/ai/types';
 
@@ -78,6 +80,7 @@ const strategyItemVariants = {
 export default function ChatPage() {
   const { address, isConnected } = useAccount();
   const router = useRouter();
+  const { completeMission } = useGamification();
   const [messages, setMessages] = useState<ChatMessage[]>([INITIAL_MESSAGE]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -85,14 +88,11 @@ export default function ChatPage() {
   const [lastAllocation, setLastAllocation] = useState<StrategyAllocation | null>(null);
   const [lastRiskLevel, setLastRiskLevel] = useState<RiskLevel | null>(null);
   const [isFocused, setIsFocused] = useState(false);
+  const [hasCompletedMission, setHasCompletedMission] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (!isConnected) {
-      router.push('/');
-    }
-  }, [isConnected, router]);
+  // RequireWallet handles the redirect now
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -101,6 +101,12 @@ export default function ChatPage() {
   const sendMessage = useCallback(
     async (content: string) => {
       if (!content.trim() || isLoading) return;
+
+      // Complete ask_ai mission on first message
+      if (!hasCompletedMission) {
+        completeMission('ask_ai');
+        setHasCompletedMission(true);
+      }
 
       const userMessage: ChatMessage = {
         id: `user-${Date.now()}`,
@@ -177,11 +183,8 @@ export default function ChatPage() {
     });
   };
 
-  if (!isConnected) {
-    return null;
-  }
-
   return (
+    <RequireWallet>
     <div className="min-h-dvh bg-cream flex flex-col">
       {/* Animated Header */}
       <Header />
@@ -601,5 +604,6 @@ export default function ChatPage() {
         </motion.div>
       </div>
     </div>
+    </RequireWallet>
   );
 }

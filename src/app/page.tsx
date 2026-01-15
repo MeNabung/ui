@@ -278,9 +278,6 @@ export default function Home() {
                   </>
                 ) : (
                   <div className="space-y-3">
-                    <AnimatedButton>
-                      <WalletConnect />
-                    </AnimatedButton>
                     <p className="text-sm text-muted-foreground">
                       Connect your wallet to begin your savings journey
                     </p>
@@ -510,16 +507,16 @@ export default function Home() {
             </AnimatedButton>
           ) : (
             <AnimatedButton className="inline-block">
-              <WalletConnect />
+              <WalletConnect variant="light" />
             </AnimatedButton>
           )}
         </FadeUp>
       </section>
 
       {/* Footer */}
-      <footer className="bg-teal-dark py-12 px-4">
+      <footer className="bg-teal-dark py-8 sm:py-12 px-4">
         <FadeUp className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-6">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center">
                 <span className="text-white font-display font-semibold">M</span>
@@ -528,16 +525,17 @@ export default function Home() {
                 MeNabung
               </span>
             </div>
-            <div className="flex items-center gap-6 text-sm text-white/70">
+            {/* Stack vertically on mobile, horizontal on sm+ */}
+            <div className="flex flex-col sm:flex-row items-center gap-1.5 sm:gap-6 text-xs sm:text-sm text-white/70">
               <span>Built on Base</span>
-              <span className="w-1 h-1 bg-white/30 rounded-full" />
+              <span className="hidden sm:block w-1 h-1 bg-white/30 rounded-full" />
               <span>Powered by AI</span>
-              <span className="w-1 h-1 bg-white/30 rounded-full" />
+              <span className="hidden sm:block w-1 h-1 bg-white/30 rounded-full" />
               <span>Your Keys, Your Crypto</span>
             </div>
           </div>
-          <div className="mt-8 pt-8 border-t border-white/10 text-center">
-            <p className="text-sm text-white/50">
+          <div className="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-white/10 text-center">
+            <p className="text-xs sm:text-sm text-white/50">
               {new Date().getFullYear()} MeNabung. Empowering Indonesian savers
               through decentralized finance.
             </p>

@@ -112,7 +112,11 @@ function getDicebearAvatar(address: string, size: number = 32): string {
   return `https://api.dicebear.com/9.x/thumbs/svg?seed=${address}&size=${size}&backgroundColor=0D4F4F,C4A35A,B85C38`;
 }
 
-export function WalletConnect() {
+interface WalletConnectProps {
+  variant?: 'default' | 'light';
+}
+
+export function WalletConnect({ variant = 'default' }: WalletConnectProps) {
   const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
   const [isOpen, setIsOpen] = useState(false);
@@ -141,9 +145,13 @@ export function WalletConnect() {
 
   // Not connected - use OnchainKit's ConnectWallet which triggers the modal
   if (!isConnected) {
+    const buttonClasses = variant === 'light'
+      ? '!bg-white hover:!bg-cream !text-teal font-medium !px-5 !py-2.5 !rounded-xl transition-all duration-200 !shadow-sm hover:!shadow-md !border-0'
+      : '!bg-teal hover:!bg-teal-light !text-white font-medium !px-5 !py-2.5 !rounded-xl transition-all duration-200 !shadow-sm hover:!shadow-md !border-0';
+
     return (
       <Wallet>
-        <ConnectWallet className="!bg-teal hover:!bg-teal-light !text-white font-medium !px-5 !py-2.5 !rounded-xl transition-all duration-200 !shadow-sm hover:!shadow-md !border-0">
+        <ConnectWallet className={buttonClasses}>
           <span className="text-sm">Connect Wallet</span>
         </ConnectWallet>
       </Wallet>
@@ -157,7 +165,7 @@ export function WalletConnect() {
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          'flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all duration-200',
+          'flex items-center gap-1.5 sm:gap-2.5 px-2 sm:px-3 py-2 rounded-xl transition-all duration-200',
           'bg-teal hover:bg-teal-light text-white',
           'shadow-sm hover:shadow-md cursor-pointer',
           isOpen && 'bg-teal-light shadow-md'
@@ -171,8 +179,8 @@ export function WalletConnect() {
           className="size-7 rounded-full ring-2 ring-white/20 bg-cream"
         />
 
-        {/* Address */}
-        <span className="text-sm font-medium">
+        {/* Address - hidden on mobile */}
+        <span className="hidden sm:inline text-sm font-medium">
           {address ? formatAddress(address) : ''}
         </span>
 

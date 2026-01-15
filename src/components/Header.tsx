@@ -12,6 +12,7 @@ const navLinks = [
   { href: '/quiz', label: 'Risk Quiz' },
   { href: '/chat', label: 'AI Advisor' },
   { href: '/dashboard', label: 'Dashboard' },
+  { href: '/achievements', label: 'Achievements' },
 ];
 
 export function Header() {
@@ -57,33 +58,35 @@ export function Header() {
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => {
-              const isActive = pathname === link.href;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={cn(
-                    'relative px-4 py-2 text-sm font-medium rounded-lg transition-colors',
-                    isActive
-                      ? 'text-teal'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-cream'
-                  )}
-                >
-                  {link.label}
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeNav"
-                      className="absolute inset-0 bg-cream-dark rounded-lg -z-10"
-                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                    />
-                  )}
-                </Link>
-              );
-            })}
-          </div>
+          {/* Desktop Navigation - only show when connected */}
+          {isConnected && (
+            <div className="hidden md:flex items-center gap-1">
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={cn(
+                      'relative px-4 py-2 text-sm font-medium rounded-lg transition-colors',
+                      isActive
+                        ? 'text-teal'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-cream'
+                    )}
+                  >
+                    {link.label}
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeNav"
+                        className="absolute inset-0 bg-cream-dark rounded-lg -z-10"
+                        transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                      />
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          )}
 
           {/* Wallet Connect */}
           <div className="flex items-center gap-2 sm:gap-3">
