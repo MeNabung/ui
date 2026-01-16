@@ -12,6 +12,7 @@ import { RequireWallet } from '@/components/RequireWallet';
 import { FadeUp, AnimatedCard, AnimatedButton } from '@/components/motion';
 import { useGamification } from '@/lib/gamification';
 import { cn } from '@/lib/utils';
+import { saveStrategyFromProfile } from '@/lib/strategy-storage';
 
 interface Question {
   id: number;
@@ -112,11 +113,19 @@ export default function QuizPage() {
   };
 
   const handleStartChat = () => {
-    // Store result in localStorage for the chat to use
+    // Store result in localStorage for the chat and deposit pages to use
     if (result) {
-      localStorage.setItem('riskProfile', result);
+      saveStrategyFromProfile(result);
     }
     router.push('/chat');
+  };
+
+  const handleStartDeposit = () => {
+    // Store result and go directly to deposit
+    if (result) {
+      saveStrategyFromProfile(result);
+    }
+    router.push('/deposit');
   };
 
   if (result) {
@@ -199,26 +208,32 @@ export default function QuizPage() {
                 >
                   <AnimatedButton>
                     <Button
-                      onClick={handleStartChat}
+                      onClick={handleStartDeposit}
                       className="w-full bg-teal hover:bg-teal-light text-white h-11 sm:h-12 font-medium text-sm sm:text-base"
                     >
-                      Continue to AI
+                      Start Growing 🌱
                       <ArrowRightIcon className="ml-2 size-4" />
                     </Button>
                   </AnimatedButton>
                   <AnimatedButton>
                     <Button
+                      onClick={handleStartChat}
                       variant="outline"
-                      onClick={() => {
-                        setCurrentQuestion(0);
-                        setAnswers([]);
-                        setResult(null);
-                      }}
-                      className="w-full h-11 sm:h-12 text-sm sm:text-base"
+                      className="w-full h-11 sm:h-12 text-sm sm:text-base border-teal text-teal hover:bg-cream-dark"
                     >
-                      Retake
+                      Ask AI for Advice
                     </Button>
                   </AnimatedButton>
+                  <button
+                    onClick={() => {
+                      setCurrentQuestion(0);
+                      setAnswers([]);
+                      setResult(null);
+                    }}
+                    className="text-sm text-muted-foreground hover:text-teal transition-colors cursor-pointer"
+                  >
+                    Retake Quiz
+                  </button>
                 </motion.div>
               </CardContent>
             </Card>

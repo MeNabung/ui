@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
-import { useAccount, useBalance } from "wagmi";
+import { useAccount, useBalance, useChainId } from "wagmi";
 import { useRouter } from "next/navigation";
 import { WalletConnect } from "@/components/WalletConnect";
 import { RequireWallet } from "@/components/RequireWallet";
@@ -27,76 +27,29 @@ import {
   FloatingElement,
   fadeUpVariants,
 } from "@/components/motion";
+import {
+  useUserPosition,
+  useUserTotalBalance,
+  usePositionBreakdown,
+  useIDRXBalance,
+  formatIDRX,
+  isContractDeployed,
+} from "@/lib/contracts";
 
-// Mock data for demonstration
-const PORTFOLIO_DATA = {
-  totalValue: 15847250,
-  totalYield: 8.42,
-  strategies: [
-    {
-      id: "thetanuts",
-      name: "Thetanuts Options",
-      value: 6338900,
-      allocation: 40,
-      apy: 12.5,
-      status: "active",
-    },
-    {
-      id: "aerodrome",
-      name: "Aerodrome LP",
-      value: 4754175,
-      allocation: 30,
-      apy: 7.8,
-      status: "active",
-    },
-    {
-      id: "staking",
-      name: "IDRX Staking",
-      value: 4754175,
-      allocation: 30,
-      apy: 5.2,
-      status: "active",
-    },
-  ],
-  recentActivity: [
-    {
-      id: 1,
-      type: "deposit",
-      amount: 5000000,
-      timestamp: "2024-01-15T10:30:00Z",
-      strategy: "Thetanuts Options",
-    },
-    {
-      id: 2,
-      type: "yield",
-      amount: 125000,
-      timestamp: "2024-01-14T08:00:00Z",
-      strategy: "Aerodrome LP",
-    },
-    {
-      id: 3,
-      type: "rebalance",
-      amount: 0,
-      timestamp: "2024-01-13T14:15:00Z",
-      strategy: "Portfolio",
-    },
-    {
-      id: 4,
-      type: "deposit",
-      amount: 3000000,
-      timestamp: "2024-01-12T09:45:00Z",
-      strategy: "IDRX Staking",
-    },
-  ],
+// Strategy APY rates
+const STRATEGY_APYS = {
+  options: 8,
+  lp: 12,
+  staking: 15,
 };
 
-// Growth stages based on portfolio size
+// Growth stages based on portfolio size (adjusted for real IDRX values)
 function getGrowthStage(totalValue: number): number {
-  if (totalValue < 1000000) return 1;
-  if (totalValue < 5000000) return 2;
-  if (totalValue < 10000000) return 3;
-  if (totalValue < 25000000) return 4;
-  return 5;
+  if (totalValue < 10) return 1;      // < 10 IDRX
+  if (totalValue < 100) return 2;     // < 100 IDRX
+  if (totalValue < 500) return 3;     // < 500 IDRX
+  if (totalValue < 1000) return 4;    // < 1000 IDRX
+  return 5;                            // >= 1000 IDRX
 }
 
 // Animated Progress Bar Component
@@ -472,7 +425,7 @@ function WithdrawIcon() {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <path d="M12 2v20M2 12h20" transform="rotate(45 12 12)" />
+      <path d="M5 12h14" />
     </svg>
   );
 }
@@ -493,6 +446,44 @@ function RebalanceIcon() {
       <path d="M21 3v5h-5" />
       <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
       <path d="M3 21v-5h5" />
+    </svg>
+  );
+}
+
+function SeedlingIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M12 10a4 4 0 0 0 4-4V2H8v4a4 4 0 0 0 4 4Z" />
+      <path d="M12 22v-6" />
+      <path d="M12 13a6 6 0 0 0-6 6h12a6 6 0 0 0-6-6Z" />
+    </svg>
+  );
+}
+
+function SparklesIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+      <path d="M5 3v4" />
+      <path d="M19 17v4" />
+      <path d="M3 5h4" />
+      <path d="M17 19h4" />
     </svg>
   );
 }
@@ -542,70 +533,71 @@ function StrategyIcon({ type }: { type: string }) {
   );
 }
 
-function ActivityIcon({ type }: { type: string }) {
-  if (type === "deposit") {
-    return (
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-      >
-        <path d="M12 19V5M5 12l7-7 7 7" />
-      </svg>
-    );
-  }
-  if (type === "yield") {
-    return (
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-      >
-        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-      </svg>
-    );
-  }
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-    >
-      <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
-      <path d="M21 3v5h-5" />
-    </svg>
-  );
-}
-
-function formatIDRX(value: number): string {
-  return new Intl.NumberFormat("en-US").format(value);
-}
-
-function formatDate(dateString: string): string {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
 
 export default function DashboardPage() {
   const { address, isConnected } = useAccount();
   const router = useRouter();
+  const chainId = useChainId();
   const { data: balance } = useBalance({
     address,
   });
+
+  // Contract hooks - read real data when deployed
+  const { data: idrxBalance } = useIDRXBalance(address);
+  const { position } = useUserPosition(address);
+  const { balance: vaultBalance } = useUserTotalBalance(address);
+  const { breakdown } = usePositionBreakdown(address);
+
+  // Check if contracts are deployed
+  const contractsDeployed = isContractDeployed(chainId);
+
+  // Check if user has any deposits
+  const hasDeposits = position && parseFloat(position.totalDeposited) > 0;
+
+  // Calculate portfolio data from contracts (real data only)
+  const portfolioData = useMemo(() => {
+    if (!contractsDeployed || !hasDeposits) {
+      return null; // No data to show
+    }
+
+    const totalValue = parseFloat(vaultBalance);
+    // Calculate APY based on allocations
+    const optionsApy = position!.optionsAllocation * 0.08;
+    const lpApy = position!.lpAllocation * 0.12;
+    const stakingApy = position!.stakingAllocation * 0.15;
+    const weightedApy = ((optionsApy + lpApy + stakingApy) / 100).toFixed(2);
+
+    return {
+      totalValue: totalValue,
+      totalYield: parseFloat(weightedApy),
+      strategies: [
+        {
+          id: "thetanuts",
+          name: "Thetanuts Options",
+          value: breakdown ? parseFloat(breakdown.optionsValue) : totalValue * position!.optionsAllocation / 100,
+          allocation: position!.optionsAllocation,
+          apy: STRATEGY_APYS.options,
+          status: "active" as const,
+        },
+        {
+          id: "aerodrome",
+          name: "Aerodrome LP",
+          value: breakdown ? parseFloat(breakdown.lpValue) : totalValue * position!.lpAllocation / 100,
+          allocation: position!.lpAllocation,
+          apy: STRATEGY_APYS.lp,
+          status: "active" as const,
+        },
+        {
+          id: "staking",
+          name: "IDRX Staking",
+          value: breakdown ? parseFloat(breakdown.stakingValue) : totalValue * position!.stakingAllocation / 100,
+          allocation: position!.stakingAllocation,
+          apy: STRATEGY_APYS.staking,
+          status: "active" as const,
+        },
+      ],
+    };
+  }, [contractsDeployed, hasDeposits, position, vaultBalance, breakdown]);
 
   // Gamification state
   const {
@@ -622,12 +614,20 @@ export default function DashboardPage() {
     }
   }, [isConnected, checkIn, completeMission]);
 
-  const growthStage = getGrowthStage(PORTFOLIO_DATA.totalValue);
+  const growthStage = portfolioData ? getGrowthStage(portfolioData.totalValue) : 1;
   const streak = gamificationState.streak.currentStreak;
   const completedMissions = gamificationState.missions.filter(
     (m) => m.completed
   ).length;
   const totalMissions = gamificationState.missions.length;
+
+  // Format IDRX balance for display
+  const formattedIDRXBalance = useMemo(() => {
+    if (idrxBalance) {
+      return formatIDRX(Number(idrxBalance) / 100); // IDRX has 2 decimals
+    }
+    return "0";
+  }, [idrxBalance]);
 
   return (
     <RequireWallet>
@@ -649,14 +649,10 @@ export default function DashboardPage() {
               </div>
               <div className="text-left sm:text-right">
                 <p className="text-xs sm:text-sm text-muted-foreground mb-0.5">
-                  Balance
+                  Wallet IDRX
                 </p>
                 <p className="text-base sm:text-lg font-semibold text-foreground tabular-nums">
-                  {balance
-                    ? `${parseFloat(balance.formatted).toFixed(4)} ${
-                        balance.symbol
-                      }`
-                    : "Loading..."}
+                  {formattedIDRXBalance} IDRX
                 </p>
               </div>
             </div>
@@ -676,53 +672,74 @@ export default function DashboardPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="px-4 sm:px-6">
-                  <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
-                    <div>
-                      <p className="text-2xl sm:text-4xl font-bold text-teal tabular-nums">
-                        <AnimatedNumber
-                          value={PORTFOLIO_DATA.totalValue}
-                          duration={1.2}
-                        />
-                      </p>
-                      <p className="text-xs sm:text-sm text-muted-foreground">
-                        IDRX
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.5, duration: 0.3 }}
-                      >
-                        <Badge className="bg-teal text-primary-foreground">
-                          +{PORTFOLIO_DATA.totalYield}% APY
-                        </Badge>
-                      </motion.div>
-                    </div>
-                  </div>
-
-                  {/* Strategy Allocation Breakdown with Animated Progress */}
-                  <div className="space-y-4">
-                    <p className="text-sm font-medium text-foreground">
-                      Strategy Allocation
-                    </p>
-                    {PORTFOLIO_DATA.strategies.map((strategy, index) => (
-                      <div key={strategy.id} className="space-y-2">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-foreground">
-                            {strategy.name}
-                          </span>
-                          <span className="text-muted-foreground tabular-nums">
-                            {strategy.allocation}%
-                          </span>
+                  {portfolioData ? (
+                    <>
+                      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
+                        <div>
+                          <p className="text-2xl sm:text-4xl font-bold text-teal tabular-nums">
+                            <AnimatedNumber
+                              value={portfolioData.totalValue}
+                              duration={1.2}
+                            />
+                          </p>
+                          <p className="text-xs sm:text-sm text-muted-foreground">
+                            IDRX
+                          </p>
                         </div>
-                        <AnimatedProgress
-                          value={strategy.allocation}
-                          delay={0.2 + index * 0.15}
-                        />
+                        <div className="flex items-center gap-2">
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.5, duration: 0.3 }}
+                          >
+                            <Badge className="bg-teal text-primary-foreground">
+                              +{portfolioData.totalYield}% APY
+                            </Badge>
+                          </motion.div>
+                        </div>
                       </div>
-                    ))}
-                  </div>
+
+                      {/* Strategy Allocation Breakdown with Animated Progress */}
+                      <div className="space-y-4">
+                        <p className="text-sm font-medium text-foreground">
+                          Strategy Allocation
+                        </p>
+                        {portfolioData.strategies.map((strategy, index) => (
+                          <div key={strategy.id} className="space-y-2">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-foreground">
+                                {strategy.name}
+                              </span>
+                              <span className="text-muted-foreground tabular-nums">
+                                {strategy.allocation}%
+                              </span>
+                            </div>
+                            <AnimatedProgress
+                              value={strategy.allocation}
+                              delay={0.2 + index * 0.15}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center py-8">
+                      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-cream-dark flex items-center justify-center">
+                        <SeedlingIcon className="w-8 h-8 text-teal" />
+                      </div>
+                      <p className="text-lg font-medium text-foreground mb-2">
+                        No deposits yet
+                      </p>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Start growing your IDRX by making your first deposit
+                      </p>
+                      <Link href="/deposit">
+                        <Button className="bg-teal hover:bg-teal-light text-white">
+                          Make First Deposit
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </FadeUp>
@@ -757,55 +774,57 @@ export default function DashboardPage() {
             </FadeUp>
           </div>
 
-          {/* Strategy Cards with Stagger */}
-          <StaggerContainer className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 mb-6 sm:mb-8">
-            {PORTFOLIO_DATA.strategies.map((strategy) => (
-              <AnimatedCard key={strategy.id}>
-                <Card className="h-full">
-                  <CardHeader className="pb-2 sm:pb-4 px-3 sm:px-6">
-                    <div className="flex items-center justify-between">
-                      <motion.div
-                        className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-cream-dark flex items-center justify-center text-teal"
-                        whileHover={{ rotate: 5 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <StrategyIcon type={strategy.id} />
-                      </motion.div>
-                      <Badge
-                        variant="outline"
-                        className="text-teal border-teal text-[10px] sm:text-xs"
-                      >
-                        {strategy.status}
-                      </Badge>
-                    </div>
-                    <CardTitle className="font-display text-sm sm:text-base text-foreground mt-2 sm:mt-3">
-                      {strategy.name}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="px-3 sm:px-6">
-                    <p className="text-xl sm:text-2xl font-bold text-teal tabular-nums">
-                      <AnimatedNumber value={strategy.value} duration={1} />
-                    </p>
-                    <p className="text-xs sm:text-sm text-muted-foreground">
-                      IDRX
-                    </p>
-                    <div className="mt-3 pt-3 sm:mt-4 sm:pt-4 border-t border-border">
+          {/* Strategy Cards with Stagger - Only show if user has deposits */}
+          {portfolioData && (
+            <StaggerContainer className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 mb-6 sm:mb-8">
+              {portfolioData.strategies.map((strategy) => (
+                <AnimatedCard key={strategy.id}>
+                  <Card className="h-full">
+                    <CardHeader className="pb-2 sm:pb-4 px-3 sm:px-6">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs sm:text-sm text-muted-foreground">
-                          APY
-                        </span>
-                        <span className="text-xs sm:text-sm font-semibold text-gold tabular-nums">
-                          {strategy.apy}%
-                        </span>
+                        <motion.div
+                          className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-cream-dark flex items-center justify-center text-teal"
+                          whileHover={{ rotate: 5 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <StrategyIcon type={strategy.id} />
+                        </motion.div>
+                        <Badge
+                          variant="outline"
+                          className="text-teal border-teal text-[10px] sm:text-xs"
+                        >
+                          {strategy.status}
+                        </Badge>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </AnimatedCard>
+                      <CardTitle className="font-display text-sm sm:text-base text-foreground mt-2 sm:mt-3">
+                        {strategy.name}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="px-3 sm:px-6">
+                      <p className="text-xl sm:text-2xl font-bold text-teal tabular-nums">
+                        <AnimatedNumber value={strategy.value} duration={1} />
+                      </p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">
+                        IDRX
+                      </p>
+                      <div className="mt-3 pt-3 sm:mt-4 sm:pt-4 border-t border-border">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs sm:text-sm text-muted-foreground">
+                            APY
+                          </span>
+                          <span className="text-xs sm:text-sm font-semibold text-gold tabular-nums">
+                            {strategy.apy}%
+                          </span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </AnimatedCard>
             ))}
           </StaggerContainer>
+          )}
 
-          {/* Quick Actions and Recent Activity */}
+          {/* Quick Actions and Achievements */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
             {/* Quick Actions */}
             <FadeUp className="lg:col-span-1">
@@ -815,16 +834,18 @@ export default function DashboardPage() {
                     Quick Actions
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-2 sm:space-y-3 px-3 sm:px-6">
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <Button className="w-full justify-start gap-2 sm:gap-3 bg-teal hover:bg-teal-light transition-colors text-sm">
-                      <DepositIcon />
-                      Deposit
-                    </Button>
-                  </motion.div>
+                <CardContent className="flex flex-col gap-2 sm:gap-3 px-3 sm:px-6">
+                  <Link href="/deposit" className="block">
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <Button className="w-full justify-start gap-2 sm:gap-3 bg-teal hover:bg-teal-light transition-colors text-sm">
+                        <DepositIcon />
+                        Deposit
+                      </Button>
+                    </motion.div>
+                  </Link>
                   <motion.div
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -832,6 +853,7 @@ export default function DashboardPage() {
                     <Button
                       variant="outline"
                       className="w-full justify-start gap-2 sm:gap-3 text-teal border-teal hover:bg-cream-dark transition-colors text-sm"
+                      onClick={() => alert('Withdraw feature coming soon!')}
                     >
                       <WithdrawIcon />
                       Withdraw
@@ -844,6 +866,7 @@ export default function DashboardPage() {
                     <Button
                       variant="outline"
                       className="w-full justify-start gap-2 sm:gap-3 text-teal border-teal hover:bg-cream-dark transition-colors text-sm"
+                      onClick={() => alert('Rebalance feature coming soon!')}
                     >
                       <RebalanceIcon />
                       Rebalance
@@ -922,70 +945,33 @@ export default function DashboardPage() {
               </Card>
             </FadeUp>
 
-            {/* Recent Activity */}
+            {/* AI Advisor Card */}
             <FadeUp>
               <Card>
                 <CardHeader className="px-3 sm:px-6 pb-2 sm:pb-4">
                   <CardTitle className="font-display text-base sm:text-lg text-teal">
-                    Recent Activity
+                    AI Advisor
                   </CardTitle>
                   <CardDescription className="text-xs sm:text-sm">
-                    Latest transactions
+                    Get personalized advice
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="px-3 sm:px-6">
-                  <div className="space-y-2 sm:space-y-4">
-                    {PORTFOLIO_DATA.recentActivity.map((activity, index) => (
-                      <motion.div
-                        key={activity.id}
-                        className="flex items-center justify-between py-2 sm:py-3 border-b border-border last:border-0"
-                        initial={{ opacity: 0, x: -10 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: index * 0.1, duration: 0.3 }}
+                  <div className="text-center py-4">
+                    <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-teal/10 flex items-center justify-center">
+                      <SparklesIcon className="w-6 h-6 text-teal" />
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Chat with our AI to get personalized investment strategies
+                    </p>
+                    <Link href="/chat">
+                      <Button
+                        variant="outline"
+                        className="text-teal border-teal hover:bg-cream-dark"
                       >
-                        <div className="flex items-center gap-2 sm:gap-3">
-                          <motion.div
-                            className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center ${
-                              activity.type === "deposit"
-                                ? "bg-teal/10 text-teal"
-                                : activity.type === "yield"
-                                ? "bg-gold/10 text-gold"
-                                : "bg-cream-dark text-muted-foreground"
-                            }`}
-                            whileHover={{ scale: 1.1 }}
-                            transition={{ duration: 0.2 }}
-                          >
-                            <ActivityIcon type={activity.type} />
-                          </motion.div>
-                          <div>
-                            <p className="text-xs sm:text-sm font-medium text-foreground capitalize">
-                              {activity.type}
-                            </p>
-                            <p className="text-[10px] sm:text-xs text-muted-foreground">
-                              {activity.strategy}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          {activity.amount > 0 && (
-                            <p
-                              className={`text-xs sm:text-sm font-semibold tabular-nums ${
-                                activity.type === "yield"
-                                  ? "text-gold"
-                                  : "text-foreground"
-                              }`}
-                            >
-                              {activity.type === "yield" ? "+" : ""}
-                              {formatIDRX(activity.amount)}
-                            </p>
-                          )}
-                          <p className="text-[10px] sm:text-xs text-muted-foreground">
-                            {formatDate(activity.timestamp)}
-                          </p>
-                        </div>
-                      </motion.div>
-                    ))}
+                        Start Chat
+                      </Button>
+                    </Link>
                   </div>
                 </CardContent>
               </Card>
