@@ -23,7 +23,7 @@ export function Providers({ children }: ProvidersProps) {
           config={{
             appearance: {
               name: 'MeNabung',
-              logo: '/logo.svg',
+              logo: '/images/logo.png',
               mode: 'auto',
               theme: 'default',
             },

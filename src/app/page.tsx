@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useAccount } from "wagmi";
 import { Button } from "@/components/ui/button";
 import {
@@ -797,9 +798,13 @@ export default function Home() {
               className="flex items-center gap-2.5"
               whileHover={{ scale: 1.05 }}
             >
-              <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center" style={{ boxShadow: '2px 2px 0px rgba(0,0,0,0.2)' }}>
-                <span className="text-teal font-display font-bold text-lg">M</span>
-              </div>
+              <Image
+                src="/images/logo.png"
+                alt="MeNabung"
+                width={40}
+                height={40}
+                className="size-10"
+              />
               <span className="font-display font-semibold text-xl text-white">
                 MeNabung
               </span>

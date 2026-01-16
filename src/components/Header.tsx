@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import { motion } from 'motion/react';
@@ -23,23 +23,21 @@ export function Header() {
       <nav className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex items-center h-14 sm:h-16">
           {/* Logo - Left */}
-          <Link href="/" className="flex items-center gap-2 sm:gap-2.5 group">
+          <Link href="/" className="flex items-center gap-2 group">
             <motion.div
-              whileHover={{ rotate: [0, -10, 10, 0] }}
-              transition={{ duration: 0.5 }}
-              className="relative"
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2 }}
             >
-              <div className="size-8 sm:size-9 bg-teal rounded-xl flex items-center justify-center shadow-sm">
-                <span className="text-white font-display font-bold text-base sm:text-lg">M</span>
-              </div>
-              {/* Decorative dot */}
-              <motion.div
-                className="absolute -top-0.5 -right-0.5 size-2 sm:size-2.5 bg-gold rounded-full"
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              <Image
+                src="/images/logo.png"
+                alt="MeNabung"
+                width={36}
+                height={36}
+                className="size-8 sm:size-9"
+                priority
               />
             </motion.div>
-            <span className="font-display font-semibold text-teal text-base sm:text-lg">
+            <span className="font-display font-semibold text-teal text-lg sm:text-xl">
               MeNabung
             </span>
           </Link>
