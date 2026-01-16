@@ -139,6 +139,37 @@ h1, h2, h3, .font-display {
               0 8px 24px rgba(13, 79, 79, 0.08);
 }
 
+/* Playful Geometric - Hard shadows */
+.shadow-hard {
+  box-shadow: 4px 4px 0px var(--teal-dark);
+}
+
+.shadow-hard-sm {
+  box-shadow: 3px 3px 0px var(--teal-dark);
+}
+
+.shadow-hard-lg {
+  box-shadow: 6px 6px 0px var(--teal-dark);
+}
+
+.shadow-hard-gold {
+  box-shadow: 4px 4px 0px var(--gold-dark);
+}
+
+.shadow-hard-terracotta {
+  box-shadow: 4px 4px 0px var(--terracotta);
+}
+
+/* Hard shadow hover effect - lift and grow */
+.shadow-hard-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.shadow-hard-hover:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px var(--teal-dark);
+}
+
 /* Batik-inspired subtle pattern */
 .batik-pattern {
   background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 0L40 20L20 40L0 20z' fill='none' stroke='%230D4F4F' stroke-width='0.5' opacity='0.05'/%3E%3C/svg%3E");
@@ -147,6 +178,72 @@ h1, h2, h3, .font-display {
 /* Organic flowing shape */
 .organic-blob {
   border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+}
+
+/* Playful Geometric - Dot grid pattern */
+.dot-grid {
+  background-image: radial-gradient(circle, var(--teal) 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.06;
+}
+
+/* Geometric shapes */
+.geo-circle {
+  border-radius: 50%;
+}
+
+.geo-square {
+  border-radius: 4px;
+}
+
+.geo-diamond {
+  transform: rotate(45deg);
+  border-radius: 4px;
+}
+
+/* Candy button style */
+.btn-candy {
+  border-radius: 9999px;
+  box-shadow: 3px 3px 0px var(--teal-dark);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-candy:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0px var(--teal-dark);
+}
+
+.btn-candy:active {
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0px var(--teal-dark);
+}
+
+.btn-candy-light {
+  box-shadow: 3px 3px 0px rgba(255, 255, 255, 0.3);
+}
+
+.btn-candy-light:hover {
+  box-shadow: 5px 5px 0px rgba(255, 255, 255, 0.3);
+}
+
+/* Playful card with tilt */
+.card-playful {
+  border: 2px solid var(--teal-dark);
+  box-shadow: 4px 4px 0px var(--teal-dark);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-playful:hover {
+  transform: translate(-2px, -2px) rotate(0deg);
+  box-shadow: 6px 6px 0px var(--teal-dark);
+}
+
+.card-playful-tilted {
+  transform: rotate(-2deg);
+}
+
+.card-playful-tilted:hover {
+  transform: rotate(0deg) translate(-2px, -2px);
 }
 
 /* Text utilities following ui-skills */
@@ -278,6 +375,39 @@ h1, h2, h3, .font-display {
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* View Transitions - Smooth page navigation */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 200ms;
+  animation-timing-function: ease-out;
+}
+
+::view-transition-old(root) {
+  animation-name: fade-out;
+}
+
+::view-transition-new(root) {
+  animation-name: fade-in;
+}
+
+@keyframes fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
   }
 }
 

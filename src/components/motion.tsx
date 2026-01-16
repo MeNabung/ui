@@ -77,6 +77,43 @@ export const fadeVariants: Variants = {
   },
 };
 
+// Bouncy spring config for playful animations
+const bouncySpring = {
+  type: "spring" as const,
+  stiffness: 400,
+  damping: 12,
+};
+
+// Bouncy fade up - playful entrance
+export const bouncyFadeUpVariants: Variants = {
+  hidden: { opacity: 0, y: 30, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: bouncySpring
+  },
+};
+
+// Bouncy scale - for poppy elements
+export const bouncyScaleVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: bouncySpring
+  },
+};
+
+// Wiggle animation for playful hover
+export const wiggleVariants: Variants = {
+  initial: { rotate: 0 },
+  wiggle: {
+    rotate: [0, -5, 5, -3, 3, 0],
+    transition: { duration: 0.5 }
+  },
+};
+
 // Motion wrapper components
 interface MotionDivProps extends HTMLMotionProps<'div'> {
   children: ReactNode;
@@ -169,6 +206,100 @@ export const AnimatedButton = forwardRef<HTMLDivElement, MotionDivProps>(
   )
 );
 AnimatedButton.displayName = 'AnimatedButton';
+
+// Bouncy Card - playful entrance with hover lift
+interface BouncyCardProps extends Omit<HTMLMotionProps<'div'>, 'children'> {
+  children: ReactNode;
+  className?: string;
+  delay?: number;
+}
+
+export const BouncyCard = forwardRef<HTMLDivElement, BouncyCardProps>(
+  ({ children, className, delay = 0, ...props }, ref) => (
+    <motion.div
+      ref={ref}
+      className={className}
+      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, margin: '-50px' }}
+      transition={{ ...bouncySpring, delay }}
+      whileHover={{
+        y: -4,
+        transition: { type: 'spring', stiffness: 400, damping: 20 }
+      }}
+      {...props}
+    >
+      {children}
+    </motion.div>
+  )
+);
+BouncyCard.displayName = 'BouncyCard';
+
+// Wiggle on Hover - playful interaction
+export function WiggleOnHover({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <motion.div
+      className={className}
+      whileHover={{
+        rotate: [0, -3, 3, -2, 2, 0],
+        transition: { duration: 0.4 }
+      }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+// Pop Scale - bouncy scale entrance
+export const PopScale = forwardRef<HTMLDivElement, MotionDivProps>(
+  ({ children, className, ...props }, ref) => (
+    <motion.div
+      ref={ref}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true }}
+      variants={bouncyScaleVariants}
+      className={className}
+      {...props}
+    >
+      {children}
+    </motion.div>
+  )
+);
+PopScale.displayName = 'PopScale';
+
+// Bouncy Stagger Container
+export const BouncyStagger = forwardRef<HTMLDivElement, MotionDivProps>(
+  ({ children, className, ...props }, ref) => (
+    <motion.div
+      ref={ref}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: '-50px' }}
+      variants={{
+        hidden: { opacity: 0 },
+        visible: {
+          opacity: 1,
+          transition: {
+            staggerChildren: 0.08,
+            delayChildren: 0.1,
+          },
+        },
+      }}
+      className={className}
+      {...props}
+    >
+      {children}
+    </motion.div>
+  )
+);
+BouncyStagger.displayName = 'BouncyStagger';
 
 // Animated number counter
 interface AnimatedNumberProps {
