@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useAccount } from 'wagmi';
-import { useRouter } from 'next/navigation';
-import { Header } from '@/components/Header';
-import { WalletConnect } from '@/components/WalletConnect';
-import { FadeUp } from '@/components/motion';
+import { useEffect } from "react";
+import { useAccount } from "wagmi";
+import { useRouter } from "next/navigation";
+import { Header } from "@/components/Header";
+import { WalletConnect } from "@/components/WalletConnect";
+import { FadeUp } from "@/components/motion";
 
 interface RequireWalletProps {
   children: React.ReactNode;
@@ -36,7 +36,7 @@ export function RequireWallet({ children }: RequireWalletProps) {
         <div className="h-14 sm:h-16" />
         <div className="max-w-md mx-auto px-4 py-16 sm:py-24">
           <FadeUp>
-            <div className="text-center space-y-6">
+            <div className="text-center space-y-6 flex flex-col items-center">
               <div className="size-16 mx-auto bg-teal/10 rounded-2xl flex items-center justify-center">
                 <WalletIcon className="size-8 text-teal" />
               </div>
