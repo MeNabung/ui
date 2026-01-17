@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar as UIAvatar, AvatarFallback } from "@/components/ui/avatar";
 import { Header } from "@/components/Header";
 import { RequireWallet } from "@/components/RequireWallet";
+import { Markdown } from "@/components/ui/markdown";
 import { useGamification } from "@/lib/gamification";
 import { saveCustomAllocation } from "@/lib/strategy-storage";
 import { motion, AnimatePresence } from "motion/react";
@@ -266,9 +267,7 @@ export default function ChatPage() {
                       <div className="flex flex-col gap-1">
                         <Card className="shadow-card border-0 py-0">
                           <CardContent className="p-3 sm:p-4">
-                            <p className="text-sm text-pretty leading-relaxed text-foreground whitespace-pre-wrap">
-                              {message.content}
-                            </p>
+                            <Markdown content={message.content} />
                           </CardContent>
                         </Card>
                         <motion.span
