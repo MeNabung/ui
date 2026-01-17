@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import { SYSTEM_PROMPT } from '@/lib/ai/prompts';
+import { SYSTEM_PROMPT, buildWalletContextPrompt } from '@/lib/ai/prompts';
 import {
   parseRiskLevel,
   generateAllocation,
   parseAmountFromText,
   calculateAmounts,
 } from '@/lib/ai/strategy';
-import type { ChatMessage, ChatRequest, ChatResponse, AIResponse } from '@/lib/ai/types';
+import type { ChatMessage, ChatRequest, ChatResponse, AIResponse, WalletContext } from '@/lib/ai/types';
 
 // Lazy initialize OpenAI client
 let openai: OpenAI | null = null;
@@ -28,7 +28,7 @@ function getOpenAI(): OpenAI {
 export async function POST(request: NextRequest): Promise<NextResponse<ChatResponse>> {
   try {
     const body = (await request.json()) as ChatRequest;
-    const { messages, portfolioValue } = body;
+    const { messages, portfolioValue, walletContext } = body;
 
     if (!messages || messages.length === 0) {
       return NextResponse.json(
@@ -54,10 +54,17 @@ export async function POST(request: NextRequest): Promise<NextResponse<ChatRespo
 
     // Build context for the AI
     let contextAddition = '';
+
+    // Add wallet context if provided
+    if (walletContext) {
+      contextAddition += buildWalletContextPrompt(walletContext);
+    }
+
+    // Add amount/allocation context if detected
     if (detectedAmount) {
       const allocation = generateAllocation(detectedRiskLevel);
       const breakdown = calculateAmounts(allocation, detectedAmount);
-      contextAddition = `\n\n[Context: User mentioned amount ${detectedAmount} IDRX. Detected risk profile: ${detectedRiskLevel}. Suggested breakdown: Options ${breakdown.options.amount} IDRX (${breakdown.options.percentage}%), LP ${breakdown.lp.amount} IDRX (${breakdown.lp.percentage}%), Staking ${breakdown.staking.amount} IDRX (${breakdown.staking.percentage}%)]`;
+      contextAddition += `\n\n[Context: User mentioned amount ${detectedAmount} IDRX. Detected risk profile: ${detectedRiskLevel}. Suggested breakdown: Options ${breakdown.options.amount} IDRX (${breakdown.options.percentage}%), LP ${breakdown.lp.amount} IDRX (${breakdown.lp.percentage}%), Staking ${breakdown.staking.amount} IDRX (${breakdown.staking.percentage}%)]`;
     }
 
     // Format messages for OpenAI

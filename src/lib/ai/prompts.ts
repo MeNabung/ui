@@ -1,3 +1,5 @@
+import type { WalletContext } from "./types";
+
 /**
  * System prompts for MeNabung AI DeFi Advisor
  */
@@ -86,34 +88,122 @@ Always be ready to answer questions and help users understand DeFi better!`;
 
 export const STRATEGY_EXPLANATION = {
   options: {
-    name: 'Thetanuts Options Vault',
-    description: 'Options strategy that automatically sells covered calls/puts to generate premium yield.',
-    pros: ['High yield (15-30%+)', 'Automatically managed by vault', 'No need to manage yourself'],
-    cons: ['Risk of capital loss during volatile markets', 'Funds locked during epoch', 'Need to understand options'],
-    bestFor: 'Experienced investors who understand risks and want to maximize yield',
+    name: "Thetanuts Options Vault",
+    description:
+      "Options strategy that automatically sells covered calls/puts to generate premium yield.",
+    pros: [
+      "High yield (15-30%+)",
+      "Automatically managed by vault",
+      "No need to manage yourself",
+    ],
+    cons: [
+      "Risk of capital loss during volatile markets",
+      "Funds locked during epoch",
+      "Need to understand options",
+    ],
+    bestFor:
+      "Experienced investors who understand risks and want to maximize yield",
   },
   lp: {
-    name: 'Liquidity Pool',
-    description: 'Providing liquidity on decentralized exchange and earning a share of trading fees.',
-    pros: ['Passive income from fees', 'Can withdraw anytime', 'Supports DeFi ecosystem'],
-    cons: ['Impermanent loss if token prices change drastically', 'Fluctuating yields', 'Needs monitoring'],
-    bestFor: 'Investors who want diversification and understand LP concepts',
+    name: "Liquidity Pool",
+    description:
+      "Providing liquidity on decentralized exchange and earning a share of trading fees.",
+    pros: [
+      "Passive income from fees",
+      "Can withdraw anytime",
+      "Supports DeFi ecosystem",
+    ],
+    cons: [
+      "Impermanent loss if token prices change drastically",
+      "Fluctuating yields",
+      "Needs monitoring",
+    ],
+    bestFor: "Investors who want diversification and understand LP concepts",
   },
   staking: {
-    name: 'Staking',
-    description: 'Locking tokens to help network security and receive rewards.',
-    pros: ['Safest and most predictable', 'Stable yield 5-8%', 'Simple for beginners'],
-    cons: ['Lower returns', 'Lock period applies', 'Opportunity cost'],
-    bestFor: 'Beginners and conservative investors who prioritize safety',
+    name: "Staking",
+    description: "Locking tokens to help network security and receive rewards.",
+    pros: [
+      "Safest and most predictable",
+      "Stable yield 5-8%",
+      "Simple for beginners",
+    ],
+    cons: ["Lower returns", "Lock period applies", "Opportunity cost"],
+    bestFor: "Beginners and conservative investors who prioritize safety",
   },
 };
 
-export function getStrategyExplanation(strategy: 'options' | 'lp' | 'staking'): string {
+export function getStrategyExplanation(
+  strategy: "options" | "lp" | "staking",
+): string {
   const info = STRATEGY_EXPLANATION[strategy];
   return `**${info.name}**
 ${info.description}
 
-Pros: ${info.pros.join(', ')}
-Cons: ${info.cons.join(', ')}
+Pros: ${info.pros.join(", ")}
+Cons: ${info.cons.join(", ")}
 Best for: ${info.bestFor}`;
+}
+
+/**
+ * Helper to format numbers for display in prompts
+ */
+function formatNumber(num: number): string {
+  if (num >= 1000000) {
+    return `${(num / 1000000).toFixed(1)}M`;
+  }
+  if (num >= 1000) {
+    return `${(num / 1000).toFixed(1)}K`;
+  }
+  return num.toFixed(2);
+}
+
+/**
+ * Build wallet context prompt for personalized AI advice
+ */
+export function buildWalletContextPrompt(context: WalletContext): string {
+  const { walletBalance, vaultBalance, allocations, currentApy, growthStage } =
+    context;
+  const totalPortfolio = walletBalance + vaultBalance;
+
+  // Growth stage descriptions
+  const stageDescriptions: Record<number, string> = {
+    1: "Seedling (just starting)",
+    2: "Sprout (growing)",
+    3: "Sapling (developing nicely)",
+    4: "Tree (mature portfolio)",
+    5: "Flourishing (thriving portfolio)",
+  };
+
+  let prompt = `\n\n---\n## USER'S CURRENT PORTFOLIO (REAL DATA)\n`;
+  prompt += `**Wallet Balance:** ${formatNumber(walletBalance)} IDRX (available to deposit)\n`;
+  prompt += `**Vault Balance:** ${formatNumber(vaultBalance)} IDRX (actively growing)\n`;
+  prompt += `**Total Portfolio:** ${formatNumber(totalPortfolio)} IDRX\n`;
+
+  if (vaultBalance > 0) {
+    prompt += `\n**Current Allocation:**\n`;
+    prompt += `- Thetanuts Options: ${allocations.options}%\n`;
+    prompt += `- Liquidity Pool: ${allocations.lp}%\n`;
+    prompt += `- Staking: ${allocations.staking}%\n`;
+    prompt += `\n**Current APY:** ${currentApy.toFixed(1)}%\n`;
+  } else {
+    prompt += `\n*User has not made any deposits yet.*\n`;
+  }
+
+  prompt += `**Growth Stage:** ${growthStage}/5 - ${stageDescriptions[growthStage] || stageDescriptions[1]}\n`;
+  prompt += `---\n\n`;
+
+  // Add guidance for the AI
+  prompt += `**IMPORTANT:** Use the above real data when giving personalized advice. `;
+  prompt += `Reference specific numbers (e.g., "You have ${formatNumber(walletBalance)} IDRX available to deposit"). `;
+
+  if (vaultBalance === 0 && walletBalance > 0) {
+    prompt += `Encourage the user to make their first deposit with their available ${formatNumber(walletBalance)} IDRX. `;
+  } else if (vaultBalance > 0 && walletBalance > 0) {
+    prompt += `User has funds both in wallet and vault. They could deposit more or adjust their strategy. `;
+  } else if (vaultBalance > 0 && walletBalance === 0) {
+    prompt += `User has all funds in the vault. Focus on strategy optimization. `;
+  }
+
+  return prompt;
 }

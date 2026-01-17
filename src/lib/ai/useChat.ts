@@ -1,13 +1,22 @@
-'use client';
+"use client";
 
-import { useState, useCallback } from 'react';
-import type { ChatMessage, ChatResponse, AIResponse, RiskLevel, StrategyAllocation } from './types';
+import { useState, useCallback } from "react";
+import type {
+  ChatMessage,
+  ChatResponse,
+  AIResponse,
+  RiskLevel,
+  StrategyAllocation,
+  WalletContext,
+} from "./types";
 
 interface UseChatOptions {
   /** Initial messages to populate the chat */
   initialMessages?: ChatMessage[];
   /** User's portfolio value in IDRX for context */
   portfolioValue?: number;
+  /** User's wallet context for personalized advice */
+  walletContext?: WalletContext;
   /** Callback when AI responds */
   onResponse?: (response: AIResponse) => void;
   /** Callback on error */
@@ -29,12 +38,19 @@ interface UseChatReturn {
  * React hook for interacting with MeNabung AI chat
  */
 export function useChat(options: UseChatOptions = {}): UseChatReturn {
-  const { initialMessages = [], portfolioValue, onResponse, onError } = options;
+  const {
+    initialMessages = [],
+    portfolioValue,
+    walletContext,
+    onResponse,
+    onError,
+  } = options;
 
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [lastAllocation, setLastAllocation] = useState<StrategyAllocation | null>(null);
+  const [lastAllocation, setLastAllocation] =
+    useState<StrategyAllocation | null>(null);
   const [lastRiskLevel, setLastRiskLevel] = useState<RiskLevel | null>(null);
 
   const sendMessage = useCallback(
@@ -47,7 +63,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       // Add user message to state
       const userMessage: ChatMessage = {
         id: `user-${Date.now()}`,
-        role: 'user',
+        role: "user",
         content: content.trim(),
         timestamp: Date.now(),
       };
@@ -56,21 +72,22 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       setMessages(updatedMessages);
 
       try {
-        const response = await fetch('/api/chat', {
-          method: 'POST',
+        const response = await fetch("/api/chat", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             messages: updatedMessages,
             portfolioValue,
+            walletContext,
           }),
         });
 
         const data: ChatResponse = await response.json();
 
         if (!response.ok || !data.success) {
-          const errorMessage = data.error || 'Failed to get AI response';
+          const errorMessage = data.error || "Failed to get AI response";
           setError(errorMessage);
           onError?.(errorMessage);
           return;
@@ -80,7 +97,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
           // Add assistant message to state
           const assistantMessage: ChatMessage = {
             id: `assistant-${Date.now()}`,
-            role: 'assistant',
+            role: "assistant",
             content: data.response.message,
             timestamp: Date.now(),
           };
@@ -98,14 +115,15 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
           onResponse?.(data.response);
         }
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Network error';
+        const errorMessage =
+          err instanceof Error ? err.message : "Network error";
         setError(errorMessage);
         onError?.(errorMessage);
       } finally {
         setIsLoading(false);
       }
     },
-    [messages, portfolioValue, onResponse, onError]
+    [messages, portfolioValue, walletContext, onResponse, onError],
   );
 
   const clearMessages = useCallback(() => {
@@ -136,7 +154,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
  */
 export async function getStrategy(
   riskLevel: RiskLevel,
-  amount?: number
+  amount?: number,
 ): Promise<{
   success: boolean;
   allocation?: StrategyAllocation;
@@ -148,10 +166,10 @@ export async function getStrategy(
   error?: string;
 }> {
   try {
-    const response = await fetch('/api/strategy', {
-      method: 'POST',
+    const response = await fetch("/api/strategy", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ riskLevel, amount }),
     });
@@ -160,7 +178,7 @@ export async function getStrategy(
   } catch (err) {
     return {
       success: false,
-      error: err instanceof Error ? err.message : 'Network error',
+      error: err instanceof Error ? err.message : "Network error",
     };
   }
 }
@@ -178,12 +196,12 @@ export async function getAllStrategies(): Promise<{
   error?: string;
 }> {
   try {
-    const response = await fetch('/api/strategy');
+    const response = await fetch("/api/strategy");
     return await response.json();
   } catch (err) {
     return {
       success: false,
-      error: err instanceof Error ? err.message : 'Network error',
+      error: err instanceof Error ? err.message : "Network error",
     };
   }
 }

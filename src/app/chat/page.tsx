@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
-import { useAccount } from "wagmi";
+import { useAccount, useChainId } from "wagmi";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,11 +14,18 @@ import { Markdown } from "@/components/ui/markdown";
 import { useGamification } from "@/lib/gamification";
 import { saveCustomAllocation } from "@/lib/strategy-storage";
 import { motion, AnimatePresence } from "motion/react";
+import {
+  useIDRXBalance,
+  useUserPosition,
+  useUserTotalBalance,
+  isContractDeployed,
+} from "@/lib/contracts";
 import type {
   ChatMessage,
   AIResponse,
   StrategyAllocation,
   RiskLevel,
+  WalletContext,
 } from "@/lib/ai/types";
 
 // Initial greeting message
@@ -84,10 +91,73 @@ const strategyItemVariants = {
   }),
 };
 
+// Strategy APY rates (same as dashboard)
+const STRATEGY_APYS = {
+  options: 8,
+  lp: 12,
+  staking: 15,
+};
+
+// Growth stages based on portfolio size (same as dashboard)
+function getGrowthStage(totalValue: number): number {
+  if (totalValue < 10) return 1;
+  if (totalValue < 100) return 2;
+  if (totalValue < 500) return 3;
+  if (totalValue < 1000) return 4;
+  return 5;
+}
+
 export default function ChatPage() {
   const { address, isConnected } = useAccount();
   const router = useRouter();
+  const chainId = useChainId();
   const { completeMission } = useGamification();
+
+  // Contract hooks for wallet context
+  const { data: idrxBalanceRaw } = useIDRXBalance(address);
+  const { position } = useUserPosition(address);
+  const { balance: vaultBalanceRaw } = useUserTotalBalance(address);
+
+  // Check if contracts are deployed
+  const contractsDeployed = isContractDeployed(chainId);
+
+  // Build wallet context for AI
+  const walletContext = useMemo((): WalletContext | undefined => {
+    if (!contractsDeployed || !address) return undefined;
+
+    // IDRX has 2 decimals
+    const walletBalance = idrxBalanceRaw
+      ? Number(idrxBalanceRaw) / 100
+      : 0;
+    const vaultBalance = parseFloat(vaultBalanceRaw || "0");
+
+    // Get allocations from position or use defaults
+    const allocations = position
+      ? {
+          options: position.optionsAllocation,
+          lp: position.lpAllocation,
+          staking: position.stakingAllocation,
+        }
+      : { options: 0, lp: 0, staking: 0 };
+
+    // Calculate weighted APY based on allocations
+    const currentApy =
+      vaultBalance > 0
+        ? (allocations.options / 100) * STRATEGY_APYS.options +
+          (allocations.lp / 100) * STRATEGY_APYS.lp +
+          (allocations.staking / 100) * STRATEGY_APYS.staking
+        : 0;
+
+    const growthStage = getGrowthStage(vaultBalance);
+
+    return {
+      walletBalance,
+      vaultBalance,
+      allocations,
+      currentApy,
+      growthStage,
+    };
+  }, [contractsDeployed, address, idrxBalanceRaw, vaultBalanceRaw, position]);
   const [messages, setMessages] = useState<ChatMessage[]>([INITIAL_MESSAGE]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -136,6 +206,7 @@ export default function ChatPage() {
           },
           body: JSON.stringify({
             messages: [...messages, userMessage],
+            walletContext,
           }),
         });
 
@@ -173,7 +244,7 @@ export default function ChatPage() {
         inputRef.current?.focus();
       }
     },
-    [messages, isLoading]
+    [messages, isLoading, walletContext]
   );
 
   const handleSubmit = (e: React.FormEvent) => {
