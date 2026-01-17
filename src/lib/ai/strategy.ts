@@ -216,3 +216,38 @@ export function validateAllocation(allocation: StrategyAllocation): boolean {
   const total = allocation.options + allocation.lp + allocation.staking;
   return total === 100;
 }
+
+/** Keywords that indicate user wants to take action / get a strategy recommendation */
+const ACTION_INTENT_KEYWORDS = [
+  "let's do it",
+  "lets do it",
+  "help me",
+  "do it",
+  "start",
+  "begin",
+  "ready",
+  "invest",
+  "grow",
+  "deposit",
+  "allocate",
+  "proceed",
+  "go ahead",
+  "yes",
+  "sure",
+  "sounds good",
+  "let's go",
+  "lets go",
+  "i'm in",
+  "im in",
+  "sign me up",
+];
+
+/**
+ * Detect if user message indicates intent to take action
+ * @param message - User's message text
+ * @returns true if user expresses action intent
+ */
+export function detectActionIntent(message: string): boolean {
+  const lowerMessage = message.toLowerCase();
+  return ACTION_INTENT_KEYWORDS.some((keyword) => lowerMessage.includes(keyword));
+}

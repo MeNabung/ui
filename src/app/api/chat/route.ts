@@ -6,8 +6,9 @@ import {
   generateAllocation,
   parseAmountFromText,
   calculateAmounts,
+  detectActionIntent,
 } from '@/lib/ai/strategy';
-import type { ChatMessage, ChatRequest, ChatResponse, AIResponse, WalletContext } from '@/lib/ai/types';
+import type { ChatMessage, ChatRequest, ChatResponse, AIResponse } from '@/lib/ai/types';
 
 // Lazy initialize OpenAI client
 let openai: OpenAI | null = null;
@@ -50,7 +51,13 @@ export async function POST(request: NextRequest): Promise<NextResponse<ChatRespo
 
     // Analyze user message for risk level and amount
     const detectedRiskLevel = parseRiskLevel(userMessageContent);
-    const detectedAmount = parseAmountFromText(userMessageContent) || portfolioValue;
+    const hasActionIntent = detectActionIntent(userMessageContent);
+
+    // Use explicit amount, or fall back to wallet balance if user shows action intent
+    let detectedAmount = parseAmountFromText(userMessageContent) || portfolioValue;
+    if (!detectedAmount && hasActionIntent && walletContext?.walletBalance) {
+      detectedAmount = walletContext.walletBalance;
+    }
 
     // Build context for the AI
     let contextAddition = '';
