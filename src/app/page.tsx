@@ -449,14 +449,14 @@ export default function Home() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      {/* Mock Data Display */}
+                      {/* Balance Display */}
                       <div className="bg-cream-dark border-2 border-teal/10 rounded-xl p-4">
                         <div className="flex justify-between items-baseline">
                           <span className="text-sm text-muted-foreground">
                             Total Savings
                           </span>
                           <span className="text-2xl font-display font-bold text-teal-dark tabular-nums">
-                            12,450,000
+                            0
                           </span>
                         </div>
                         <div className="text-right text-sm text-muted-foreground font-medium">
@@ -468,9 +468,9 @@ export default function Home() {
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
                           <span className="text-muted-foreground font-medium">
-                            Strategy: Balanced
+                            Default: Balanced
                           </span>
-                          <span className="font-bold text-gold">+8.2% APY</span>
+                          <span className="font-bold text-gold">~10% APY</span>
                         </div>
                         <div className="flex gap-1 h-3">
                           <motion.div
@@ -509,7 +509,7 @@ export default function Home() {
                           whileHover={{ scale: 1.02, rotate: 1 }}
                         >
                           <div className="text-lg font-display font-bold text-teal tabular-nums">
-                            +1,021,500
+                            0
                           </div>
                           <div className="text-xs font-medium text-muted-foreground">IDRX Earned</div>
                         </motion.div>
@@ -518,7 +518,7 @@ export default function Home() {
                           whileHover={{ scale: 1.02, rotate: -1 }}
                         >
                           <div className="text-lg font-display font-bold text-gold tabular-nums">
-                            🔥 14
+                            🔥 0
                           </div>
                           <div className="text-xs font-medium text-muted-foreground">
                             Day Streak
