@@ -11,10 +11,10 @@ export const IDRX_ADDRESS =
 export const CONTRACT_ADDRESSES = {
   [base.id]: {
     idrx: IDRX_ADDRESS,
-    vault: "0x2c1374170f8E05AE8714aC8b93202bA86F43914b" as const,
-    thetanutsAdapter: "0xF0C472b359A8F25404FBF906B5bfD87E676466b5" as const,
-    aerodromeAdapter: "0x18c115CaAD5656b45162D4314c653374F0e61916" as const,
-    stakingAdapter: "0x63f98bCE063cd74f5fbd4944Eb259f8c18F0026E" as const,
+    vault: "0xd3EE3ebB04A40B3a036b8c107dE4B95629A69620" as const,
+    thetanutsAdapter: "0xcAf11Df29AE619D5D5ea0BAFdf28Bc77e375D572" as const,
+    aerodromeAdapter: "0x37400c08d59EE6e4Ab600FB7508EEd17ca9157FA" as const,
+    stakingAdapter: "0x2dbEF1A046f86a78C014a9FeD5e694CD2a070e19" as const,
   },
 } as const;
 
