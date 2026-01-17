@@ -2,9 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
-import { useAccount, useBalance, useChainId } from "wagmi";
-import { useRouter } from "next/navigation";
-import { WalletConnect } from "@/components/WalletConnect";
+import { useAccount, useChainId } from "wagmi";
 import { RequireWallet } from "@/components/RequireWallet";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,7 +23,6 @@ import {
   AnimatedCard,
   AnimatedNumber,
   FloatingElement,
-  fadeUpVariants,
 } from "@/components/motion";
 import {
   useUserPosition,
@@ -45,11 +42,11 @@ const STRATEGY_APYS = {
 
 // Growth stages based on portfolio size (adjusted for real IDRX values)
 function getGrowthStage(totalValue: number): number {
-  if (totalValue < 10) return 1;      // < 10 IDRX
-  if (totalValue < 100) return 2;     // < 100 IDRX
-  if (totalValue < 500) return 3;     // < 500 IDRX
-  if (totalValue < 1000) return 4;    // < 1000 IDRX
-  return 5;                            // >= 1000 IDRX
+  if (totalValue < 10) return 1; // < 10 IDRX
+  if (totalValue < 100) return 2; // < 100 IDRX
+  if (totalValue < 500) return 3; // < 500 IDRX
+  if (totalValue < 1000) return 4; // < 1000 IDRX
+  return 5; // >= 1000 IDRX
 }
 
 // Animated Progress Bar Component
@@ -89,7 +86,7 @@ function GardenPlant({ stage }: { stage: number }) {
   return (
     <motion.svg
       viewBox="0 0 200 200"
-      className="w-full h-full max-w-[180px] mx-auto"
+      className="w-full h-full max-w-45 mx-auto"
       aria-label={`Growth stage ${stage} of 5`}
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -533,14 +530,9 @@ function StrategyIcon({ type }: { type: string }) {
   );
 }
 
-
 export default function DashboardPage() {
   const { address, isConnected } = useAccount();
-  const router = useRouter();
   const chainId = useChainId();
-  const { data: balance } = useBalance({
-    address,
-  });
 
   // Contract hooks - read real data when deployed
   const { data: idrxBalance } = useIDRXBalance(address);
@@ -562,9 +554,11 @@ export default function DashboardPage() {
 
     const totalValue = parseFloat(vaultBalance);
     // Calculate weighted APY based on allocations (allocations are already percentages)
-    const optionsApy = (position!.optionsAllocation / 100) * STRATEGY_APYS.options;
+    const optionsApy =
+      (position!.optionsAllocation / 100) * STRATEGY_APYS.options;
     const lpApy = (position!.lpAllocation / 100) * STRATEGY_APYS.lp;
-    const stakingApy = (position!.stakingAllocation / 100) * STRATEGY_APYS.staking;
+    const stakingApy =
+      (position!.stakingAllocation / 100) * STRATEGY_APYS.staking;
     const weightedApy = (optionsApy + lpApy + stakingApy).toFixed(1);
 
     return {
@@ -574,7 +568,9 @@ export default function DashboardPage() {
         {
           id: "thetanuts",
           name: "Thetanuts Options",
-          value: breakdown ? parseFloat(breakdown.optionsValue) : totalValue * position!.optionsAllocation / 100,
+          value: breakdown
+            ? parseFloat(breakdown.optionsValue)
+            : (totalValue * position!.optionsAllocation) / 100,
           allocation: position!.optionsAllocation,
           apy: STRATEGY_APYS.options,
           status: "active" as const,
@@ -582,7 +578,9 @@ export default function DashboardPage() {
         {
           id: "aerodrome",
           name: "Aerodrome LP",
-          value: breakdown ? parseFloat(breakdown.lpValue) : totalValue * position!.lpAllocation / 100,
+          value: breakdown
+            ? parseFloat(breakdown.lpValue)
+            : (totalValue * position!.lpAllocation) / 100,
           allocation: position!.lpAllocation,
           apy: STRATEGY_APYS.lp,
           status: "active" as const,
@@ -590,7 +588,9 @@ export default function DashboardPage() {
         {
           id: "staking",
           name: "IDRX Staking",
-          value: breakdown ? parseFloat(breakdown.stakingValue) : totalValue * position!.stakingAllocation / 100,
+          value: breakdown
+            ? parseFloat(breakdown.stakingValue)
+            : (totalValue * position!.stakingAllocation) / 100,
           allocation: position!.stakingAllocation,
           apy: STRATEGY_APYS.staking,
           status: "active" as const,
@@ -614,10 +614,12 @@ export default function DashboardPage() {
     }
   }, [isConnected, checkIn, completeMission]);
 
-  const growthStage = portfolioData ? getGrowthStage(portfolioData.totalValue) : 1;
+  const growthStage = portfolioData
+    ? getGrowthStage(portfolioData.totalValue)
+    : 1;
   const streak = gamificationState.streak.currentStreak;
   const completedMissions = gamificationState.missions.filter(
-    (m) => m.completed
+    (m) => m.completed,
   ).length;
   const totalMissions = gamificationState.missions.length;
 
@@ -757,7 +759,7 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent className="flex flex-col items-center justify-center px-4 sm:px-6">
                   <FloatingElement delay={0.5}>
-                    <div className="w-full aspect-square max-w-[160px] sm:max-w-[200px] flex items-center justify-center">
+                    <div className="w-full aspect-square max-w-40 sm:max-w-50 flex items-center justify-center">
                       <GardenPlant stage={growthStage} />
                     </div>
                   </FloatingElement>
@@ -820,8 +822,8 @@ export default function DashboardPage() {
                     </CardContent>
                   </Card>
                 </AnimatedCard>
-            ))}
-          </StaggerContainer>
+              ))}
+            </StaggerContainer>
           )}
 
           {/* Quick Actions and Achievements */}
@@ -853,7 +855,7 @@ export default function DashboardPage() {
                     <Button
                       variant="outline"
                       className="w-full justify-start gap-2 sm:gap-3 text-teal border-teal hover:bg-cream-dark transition-colors text-sm"
-                      onClick={() => alert('Withdraw feature coming soon!')}
+                      onClick={() => alert("Withdraw feature coming soon!")}
                     >
                       <WithdrawIcon />
                       Withdraw
@@ -866,7 +868,7 @@ export default function DashboardPage() {
                     <Button
                       variant="outline"
                       className="w-full justify-start gap-2 sm:gap-3 text-teal border-teal hover:bg-cream-dark transition-colors text-sm"
-                      onClick={() => alert('Rebalance feature coming soon!')}
+                      onClick={() => alert("Rebalance feature coming soon!")}
                     >
                       <RebalanceIcon />
                       Rebalance

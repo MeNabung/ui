@@ -126,9 +126,7 @@ export default function ChatPage() {
     if (!contractsDeployed || !address) return undefined;
 
     // IDRX has 2 decimals
-    const walletBalance = idrxBalanceRaw
-      ? Number(idrxBalanceRaw) / 100
-      : 0;
+    const walletBalance = idrxBalanceRaw ? Number(idrxBalanceRaw) / 100 : 0;
     const vaultBalance = parseFloat(vaultBalanceRaw || "0");
 
     // Get allocations from position or use defaults
@@ -244,7 +242,7 @@ export default function ChatPage() {
         inputRef.current?.focus();
       }
     },
-    [messages, isLoading, walletContext]
+    [messages, isLoading, walletContext, hasCompletedMission, completeMission],
   );
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -270,8 +268,8 @@ export default function ChatPage() {
         <Header />
 
         {/* Spacer for fixed header - responsive for mobile nav */}
-        <div className="h-14 sm:h-16 flex-shrink-0" />
-        {isConnected && <div className="h-12 md:hidden flex-shrink-0" />}
+        <div className="h-14 sm:h-16 shrink-0" />
+        {isConnected && <div className="h-12 md:hidden shrink-0" />}
 
         {/* Main chat area */}
         <div className="flex-1 overflow-hidden flex flex-col max-w-3xl mx-auto w-full px-0 sm:px-4">
@@ -305,7 +303,7 @@ export default function ChatPage() {
           {/* Messages */}
           <div className="flex-1 overflow-y-auto px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6 scroll-smooth">
             <AnimatePresence mode="popLayout">
-              {messages.map((message, index) => (
+              {messages.map((message) => (
                 <motion.div
                   key={message.id}
                   variants={messageVariants}
@@ -329,7 +327,7 @@ export default function ChatPage() {
                         }}
                         className="hidden sm:block"
                       >
-                        <UIAvatar className="w-8 h-8 flex-shrink-0 mt-1">
+                        <UIAvatar className="w-8 h-8 shrink-0 mt-1">
                           <AvatarFallback className="bg-teal text-white text-xs font-medium">
                             AI
                           </AvatarFallback>
@@ -395,7 +393,7 @@ export default function ChatPage() {
                     transition={{ duration: 0.2 }}
                     className="hidden sm:block"
                   >
-                    <UIAvatar className="w-8 h-8 flex-shrink-0">
+                    <UIAvatar className="w-8 h-8 shrink-0">
                       <AvatarFallback className="bg-teal text-white text-xs font-medium">
                         AI
                       </AvatarFallback>
@@ -442,7 +440,7 @@ export default function ChatPage() {
                     transition={{ delay: 0.1, duration: 0.2 }}
                     className="hidden sm:block"
                   >
-                    <UIAvatar className="w-8 h-8 flex-shrink-0 mt-1">
+                    <UIAvatar className="w-8 h-8 shrink-0 mt-1">
                       <AvatarFallback className="bg-gold text-white text-xs font-medium">
                         RP
                       </AvatarFallback>
@@ -663,7 +661,7 @@ export default function ChatPage() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.1 }}
-            className="border-t border-border bg-white p-3 sm:p-4 pb-4 sm:pb-5 flex-shrink-0"
+            className="border-t border-border bg-white p-3 sm:p-4 pb-4 sm:pb-5 shrink-0"
           >
             <form onSubmit={handleSubmit} className="flex gap-2 sm:gap-3">
               <motion.div
