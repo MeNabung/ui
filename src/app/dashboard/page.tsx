@@ -561,11 +561,11 @@ export default function DashboardPage() {
     }
 
     const totalValue = parseFloat(vaultBalance);
-    // Calculate APY based on allocations
-    const optionsApy = position!.optionsAllocation * 0.08;
-    const lpApy = position!.lpAllocation * 0.12;
-    const stakingApy = position!.stakingAllocation * 0.15;
-    const weightedApy = ((optionsApy + lpApy + stakingApy) / 100).toFixed(2);
+    // Calculate weighted APY based on allocations (allocations are already percentages)
+    const optionsApy = (position!.optionsAllocation / 100) * STRATEGY_APYS.options;
+    const lpApy = (position!.lpAllocation / 100) * STRATEGY_APYS.lp;
+    const stakingApy = (position!.stakingAllocation / 100) * STRATEGY_APYS.staking;
+    const weightedApy = (optionsApy + lpApy + stakingApy).toFixed(1);
 
     return {
       totalValue: totalValue,
