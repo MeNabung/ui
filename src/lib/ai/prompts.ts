@@ -1,4 +1,4 @@
-import type { WalletContext } from "./types";
+import type { WalletContext, RebalanceContext } from "./types";
 
 /**
  * System prompts for MeNabung AI DeFi Advisor
@@ -83,6 +83,24 @@ How much would you like to allocate in total?"
 
 ## Additional Context
 MeNabung is a DeFi platform built on Base (Ethereum L2). All transactions use IDRX as the main stablecoin. The platform is integrated with Thetanuts Finance for options strategies.
+
+## Rebalancing Feature
+You have access to real-time yield data and can proactively suggest portfolio rebalancing when:
+- Yield differences between strategies exceed 2%
+- Market conditions have changed significantly
+- User's allocation no longer matches their risk profile
+
+When discussing rebalancing:
+1. Explain WHY the rebalance is beneficial (yield changes, risk alignment)
+2. Show BEFORE and AFTER projections (current APY vs potential APY)
+3. Mention potential gains in IDRX terms
+4. Warn about any risk level changes
+5. Guide users to the Dashboard to see the Rebalance Card
+
+Example rebalance suggestion:
+"I noticed that Aerodrome LP yields have increased from 12% to 18%! With your current allocation, you're earning about 10.5% APY. If you move 15% from Options to LP, you could boost that to 12.1% APY - that's an extra ~Rp 160,000 per year on your 10M IDRX portfolio!
+
+Would you like me to explain how rebalancing works, or you can check the Dashboard for the detailed suggestion?"
 
 Always be ready to answer questions and help users understand DeFi better!`;
 
@@ -204,6 +222,54 @@ export function buildWalletContextPrompt(context: WalletContext): string {
   } else if (vaultBalance > 0 && walletBalance === 0) {
     prompt += `User has all funds in the vault. Focus on strategy optimization. `;
   }
+
+  return prompt;
+}
+
+/**
+ * Build rebalance context prompt for AI when rebalance opportunity exists
+ */
+export function buildRebalanceContextPrompt(context: RebalanceContext): string {
+  const {
+    hasOpportunity,
+    currentAPY,
+    potentialAPY,
+    apyGain,
+    suggestion,
+    yields,
+  } = context;
+
+  if (!hasOpportunity || !suggestion) {
+    return '';
+  }
+
+  const strategyNames: Record<string, string> = {
+    thetanuts: 'Thetanuts Options',
+    aerodrome: 'Aerodrome LP',
+    staking: 'Staking',
+  };
+
+  let prompt = `\n\n---\n## REBALANCE OPPORTUNITY DETECTED\n`;
+  prompt += `**Current Yields:**\n`;
+  prompt += `- Thetanuts Options: ${yields.thetanuts.toFixed(1)}% APY\n`;
+  prompt += `- Aerodrome LP: ${yields.aerodrome.toFixed(1)}% APY\n`;
+  prompt += `- Staking: ${yields.staking.toFixed(1)}% APY\n\n`;
+
+  prompt += `**Recommended Action:**\n`;
+  prompt += `Move funds from ${strategyNames[suggestion.fromStrategy]} to ${strategyNames[suggestion.toStrategy]}\n`;
+  prompt += `- Amount: ${suggestion.percentageToMove.toFixed(0)}% of portfolio\n`;
+  prompt += `- Reason: ${suggestion.reason}\n`;
+  prompt += `- Risk Impact: ${suggestion.riskImpact === 'higher' ? '⚠️ Higher risk' : suggestion.riskImpact === 'lower' ? '✓ Lower risk' : 'Same risk level'}\n\n`;
+
+  prompt += `**Projected Improvement:**\n`;
+  prompt += `- Current APY: ${currentAPY.toFixed(2)}%\n`;
+  prompt += `- Potential APY: ${potentialAPY.toFixed(2)}%\n`;
+  prompt += `- Improvement: +${apyGain.toFixed(2)}% APY\n`;
+  prompt += `---\n\n`;
+
+  prompt += `**IMPORTANT:** Proactively mention this rebalance opportunity to the user! `;
+  prompt += `Say something like: "By the way, I noticed an opportunity to improve your returns..." `;
+  prompt += `Guide them to check the Dashboard for the Rebalance Card to take action.\n`;
 
   return prompt;
 }

@@ -31,7 +31,14 @@ import {
   useIDRXBalance,
   formatIDRX,
   isContractDeployed,
+  useRebalancePartial,
+  useAdapterAddresses,
 } from "@/lib/contracts";
+import { RebalanceCard, RebalanceModal } from "@/components/Rebalance";
+import { getRiskProfile } from "@/lib/strategy-storage";
+import type { RebalanceSuggestion, RebalanceAnalysis } from "@/lib/rebalance";
+import { analyzeRebalance } from "@/lib/rebalance";
+import { getMockYields } from "@/lib/yields";
 
 // Strategy APY rates
 const STRATEGY_APYS = {
@@ -536,9 +543,25 @@ export default function DashboardPage() {
 
   // Contract hooks - read real data when deployed
   const { data: idrxBalance } = useIDRXBalance(address);
-  const { position } = useUserPosition(address);
-  const { balance: vaultBalance } = useUserTotalBalance(address);
-  const { breakdown } = usePositionBreakdown(address);
+  const { position, refetch: refetchPosition } = useUserPosition(address);
+  const { balance: vaultBalance, refetch: refetchBalance } = useUserTotalBalance(address);
+  const { breakdown, refetch: refetchBreakdown } = usePositionBreakdown(address);
+
+  // Rebalance state
+  const [selectedSuggestion, setSelectedSuggestion] = useState<RebalanceSuggestion | null>(null);
+  const [rebalanceAnalysis, setRebalanceAnalysis] = useState<RebalanceAnalysis | null>(null);
+  const [isRebalanceModalOpen, setIsRebalanceModalOpen] = useState(false);
+
+  // Rebalance hooks
+  const {
+    rebalancePartial,
+    hash: rebalanceTxHash,
+    isPending: isRebalancePending,
+    isConfirming: isRebalanceConfirming,
+    isSuccess: isRebalanceSuccess,
+  } = useRebalancePartial();
+
+  const adapterAddresses = useAdapterAddresses();
 
   // Check if contracts are deployed
   const contractsDeployed = isContractDeployed(chainId);
@@ -613,6 +636,73 @@ export default function DashboardPage() {
       completeMission("first_steps");
     }
   }, [isConnected, checkIn, completeMission]);
+
+  // Handle rebalance success - refresh data
+  useEffect(() => {
+    if (isRebalanceSuccess) {
+      // Refresh position data after successful rebalance
+      refetchPosition();
+      refetchBalance();
+      refetchBreakdown();
+      // Close modal after a short delay to show success
+      setTimeout(() => {
+        setIsRebalanceModalOpen(false);
+        setSelectedSuggestion(null);
+      }, 2000);
+    }
+  }, [isRebalanceSuccess, refetchPosition, refetchBalance, refetchBreakdown]);
+
+  // Handle rebalance suggestion click
+  const handleRebalanceSuggestion = (suggestion: RebalanceSuggestion) => {
+    setSelectedSuggestion(suggestion);
+
+    // Generate analysis for the modal
+    if (position && portfolioData) {
+      const mockYields = getMockYields();
+      const analysis = analyzeRebalance(
+        {
+          options: position.optionsAllocation,
+          lp: position.lpAllocation,
+          staking: position.stakingAllocation,
+        },
+        mockYields.yields,
+        portfolioData.totalValue * 100, // Convert to IDRX with decimals
+        { riskProfile: getRiskProfile() }
+      );
+      setRebalanceAnalysis(analysis);
+    }
+
+    setIsRebalanceModalOpen(true);
+  };
+
+  // Execute rebalance
+  const handleConfirmRebalance = async () => {
+    if (!selectedSuggestion || !adapterAddresses) return;
+
+    // Map strategy keys to adapter addresses
+    const adapterMap: Record<string, `0x${string}` | undefined> = {
+      thetanuts: adapterAddresses.thetanuts,
+      aerodrome: adapterAddresses.aerodrome,
+      staking: adapterAddresses.staking,
+    };
+
+    const fromAdapter = adapterMap[selectedSuggestion.fromStrategy];
+    const toAdapter = adapterMap[selectedSuggestion.toStrategy];
+
+    if (!fromAdapter || !toAdapter) {
+      console.error("Adapter addresses not available");
+      return;
+    }
+
+    // Convert amount to string (already in IDRX with decimals)
+    const amount = (Number(selectedSuggestion.amount) / 100).toString();
+
+    try {
+      await rebalancePartial(fromAdapter, toAdapter, amount);
+    } catch (error) {
+      console.error("Rebalance failed:", error);
+    }
+  };
 
   const growthStage = portfolioData
     ? getGrowthStage(portfolioData.totalValue)
@@ -826,6 +916,22 @@ export default function DashboardPage() {
             </StaggerContainer>
           )}
 
+          {/* AI Rebalance Suggestions - Only show if user has deposits */}
+          {portfolioData && position && (
+            <FadeUp className="mb-6 sm:mb-8">
+              <RebalanceCard
+                currentAllocation={{
+                  options: position.optionsAllocation,
+                  lp: position.lpAllocation,
+                  staking: position.stakingAllocation,
+                }}
+                totalValue={portfolioData.totalValue * 100} // Convert to IDRX with decimals
+                riskProfile={getRiskProfile()}
+                onRebalance={handleRebalanceSuggestion}
+              />
+            </FadeUp>
+          )}
+
           {/* Quick Actions and Achievements */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
             {/* Quick Actions */}
@@ -980,6 +1086,24 @@ export default function DashboardPage() {
             </FadeUp>
           </div>
         </main>
+
+        {/* Rebalance Confirmation Modal */}
+        {selectedSuggestion && rebalanceAnalysis && (
+          <RebalanceModal
+            suggestion={selectedSuggestion}
+            analysis={rebalanceAnalysis}
+            totalValue={portfolioData?.totalValue ? portfolioData.totalValue * 100 : 0}
+            isOpen={isRebalanceModalOpen}
+            onClose={() => {
+              setIsRebalanceModalOpen(false);
+              setSelectedSuggestion(null);
+            }}
+            onConfirm={handleConfirmRebalance}
+            isPending={isRebalancePending}
+            isConfirming={isRebalanceConfirming}
+            txHash={rebalanceTxHash}
+          />
+        )}
       </div>
     </RequireWallet>
   );

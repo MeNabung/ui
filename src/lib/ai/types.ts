@@ -85,3 +85,32 @@ export interface StrategyResponse {
   };
   error?: string;
 }
+
+/** Rebalance suggestion from the analyzer */
+export interface RebalanceSuggestionForAI {
+  fromStrategy: 'thetanuts' | 'aerodrome' | 'staking';
+  toStrategy: 'thetanuts' | 'aerodrome' | 'staking';
+  percentageToMove: number;
+  reason: string;
+  riskImpact: 'lower' | 'same' | 'higher';
+}
+
+/** Rebalance context for AI prompts */
+export interface RebalanceContext {
+  /** Whether a rebalance opportunity exists */
+  hasOpportunity: boolean;
+  /** Current weighted APY */
+  currentAPY: number;
+  /** Potential APY after rebalance */
+  potentialAPY: number;
+  /** APY gain from rebalancing */
+  apyGain: number;
+  /** Top rebalance suggestion */
+  suggestion?: RebalanceSuggestionForAI;
+  /** Current yields by strategy */
+  yields: {
+    thetanuts: number;
+    aerodrome: number;
+    staking: number;
+  };
+}

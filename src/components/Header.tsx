@@ -4,9 +4,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useAccount } from "wagmi";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
+import { useState, useEffect, useRef } from "react";
 import { WalletConnect } from "@/components/WalletConnect";
 import { cn } from "@/lib/utils";
+import { fetchAllYields } from "@/lib/yields";
+import { analyzeRebalance, filterDismissedSuggestions } from "@/lib/rebalance";
+import { getStrategy, getRiskProfile } from "@/lib/strategy-storage";
 
 const navLinks = [
   { href: "/chat", label: "AI Advisor" },
@@ -17,6 +21,64 @@ const navLinks = [
 export function Header() {
   const pathname = usePathname();
   const { isConnected } = useAccount();
+  const [hasRebalanceOpportunity, setHasRebalanceOpportunity] = useState(false);
+  const isMountedRef = useRef(true);
+
+  // Check for rebalance opportunities
+  useEffect(() => {
+    isMountedRef.current = true;
+
+    async function checkRebalance() {
+      if (!isConnected) return false;
+
+      try {
+        const strategy = getStrategy();
+        if (!strategy) return false;
+
+        const snapshot = await fetchAllYields();
+        const allocation = {
+          options: strategy.allocation.options,
+          lp: strategy.allocation.lp,
+          staking: strategy.allocation.staking,
+        };
+
+        // Use a reasonable estimate for total value (will be more accurate on dashboard)
+        const result = analyzeRebalance(
+          allocation,
+          snapshot.yields,
+          1000, // 10 IDRX minimum check (2 decimals)
+          { riskProfile: getRiskProfile() }
+        );
+
+        const activeSuggestions = filterDismissedSuggestions(result.suggestions);
+        return result.shouldRebalance && activeSuggestions.length > 0;
+      } catch (error) {
+        console.error('Failed to check rebalance:', error);
+        return false;
+      }
+    }
+
+    // Initial check
+    checkRebalance().then((hasOpportunity) => {
+      if (isMountedRef.current) {
+        setHasRebalanceOpportunity(hasOpportunity);
+      }
+    });
+
+    // Re-check every 5 minutes
+    const interval = setInterval(() => {
+      checkRebalance().then((hasOpportunity) => {
+        if (isMountedRef.current) {
+          setHasRebalanceOpportunity(hasOpportunity);
+        }
+      });
+    }, 5 * 60 * 1000);
+
+    return () => {
+      isMountedRef.current = false;
+      clearInterval(interval);
+    };
+  }, [isConnected]);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-fixed bg-white/90 backdrop-blur-sm border-b border-border safe-top">
@@ -47,6 +109,7 @@ export function Header() {
             <div className="hidden md:flex items-center gap-1 mx-auto">
               {navLinks.map((link) => {
                 const isActive = pathname === link.href;
+                const showBadge = link.href === '/dashboard' && hasRebalanceOpportunity;
                 return (
                   <Link
                     key={link.href}
@@ -59,6 +122,23 @@ export function Header() {
                     )}
                   >
                     {link.label}
+                    {/* Notification badge for rebalance opportunity */}
+                    <AnimatePresence>
+                      {showBadge && (
+                        <motion.span
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          exit={{ scale: 0 }}
+                          className="absolute -top-1 -right-1 size-2.5 bg-gold rounded-full"
+                        >
+                          <motion.span
+                            animate={{ scale: [1, 1.5, 1] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                            className="absolute inset-0 bg-gold rounded-full opacity-50"
+                          />
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
                     {isActive && (
                       <motion.div
                         layoutId="activeNav"
@@ -148,18 +228,30 @@ export function Header() {
             </Link>
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
+              const showBadge = link.href === '/dashboard' && hasRebalanceOpportunity;
               return (
                 <Link
                   key={link.href}
                   href={link.href}
                   className={cn(
-                    "px-3 py-1.5 text-xs font-medium rounded-full whitespace-nowrap transition-colors",
+                    "relative px-3 py-1.5 text-xs font-medium rounded-full whitespace-nowrap transition-colors",
                     isActive
                       ? "bg-teal text-white"
                       : "bg-cream text-muted-foreground active:bg-cream-dark",
                   )}
                 >
                   {link.label}
+                  {/* Mobile notification badge */}
+                  <AnimatePresence>
+                    {showBadge && (
+                      <motion.span
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        exit={{ scale: 0 }}
+                        className="absolute -top-0.5 -right-0.5 size-2 bg-gold rounded-full"
+                      />
+                    )}
+                  </AnimatePresence>
                 </Link>
               );
             })}

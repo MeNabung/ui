@@ -318,6 +318,107 @@ export function useRebalance() {
 }
 
 /**
+ * Hook to partially rebalance between two specific strategies
+ * Used by the AI rebalancing agent
+ */
+export function useRebalancePartial() {
+  const chainId = useChainId();
+  const { writeContract, data: hash, isPending, error } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
+
+  const rebalancePartial = async (
+    fromAdapter: `0x${string}`,
+    toAdapter: `0x${string}`,
+    amount: string
+  ) => {
+    if (!isContractDeployed(chainId)) {
+      throw new Error('Contracts not deployed on this network');
+    }
+
+    const vaultAddress = getContractAddress(chainId, 'vault');
+    const amountInWei = parseUnits(amount, IDRX_DECIMALS);
+
+    writeContract({
+      address: vaultAddress,
+      abi: MENABUNG_VAULT_ABI,
+      functionName: 'rebalancePartial',
+      args: [fromAdapter, toAdapter, amountInWei],
+    });
+  };
+
+  return {
+    rebalancePartial,
+    hash,
+    isPending,
+    isConfirming,
+    isSuccess,
+    error,
+  };
+}
+
+/**
+ * Hook to rebalance with a new strategy in one transaction
+ */
+export function useRebalanceWithNewStrategy() {
+  const chainId = useChainId();
+  const { writeContract, data: hash, isPending, error } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
+
+  const rebalanceWithNewStrategy = async (
+    options: number,
+    lp: number,
+    staking: number
+  ) => {
+    if (!isContractDeployed(chainId)) {
+      throw new Error('Contracts not deployed on this network');
+    }
+
+    if (options + lp + staking !== 100) {
+      throw new Error('Allocations must sum to 100');
+    }
+
+    const vaultAddress = getContractAddress(chainId, 'vault');
+
+    writeContract({
+      address: vaultAddress,
+      abi: MENABUNG_VAULT_ABI,
+      functionName: 'rebalanceWithNewStrategy',
+      args: [BigInt(options), BigInt(lp), BigInt(staking)],
+    });
+  };
+
+  return {
+    rebalanceWithNewStrategy,
+    hash,
+    isPending,
+    isConfirming,
+    isSuccess,
+    error,
+  };
+}
+
+/**
+ * Hook to get adapter addresses for rebalancing
+ */
+export function useAdapterAddresses() {
+  const chainId = useChainId();
+
+  if (!isContractDeployed(chainId)) {
+    return {
+      thetanuts: undefined,
+      aerodrome: undefined,
+      staking: undefined,
+    };
+  }
+
+  return {
+    thetanuts: getContractAddress(chainId, 'thetanutsAdapter'),
+    aerodrome: getContractAddress(chainId, 'aerodromeAdapter'),
+    staking: getContractAddress(chainId, 'stakingAdapter'),
+  };
+}
+
+/**
  * Helper to format IDRX amounts for display
  */
 export function formatIDRX(value: string | number): string {

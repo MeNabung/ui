@@ -175,6 +175,28 @@ export const MENABUNG_VAULT_ABI = [
     inputs: [],
     outputs: [],
   },
+  {
+    name: 'rebalancePartial',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'fromAdapter', type: 'address' },
+      { name: 'toAdapter', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+    ],
+    outputs: [],
+  },
+  {
+    name: 'rebalanceWithNewStrategy',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'optionsPercent', type: 'uint256' },
+      { name: 'lpPercent', type: 'uint256' },
+      { name: 'stakingPercent', type: 'uint256' },
+    ],
+    outputs: [],
+  },
   // Events
   {
     name: 'Deposited',
@@ -206,6 +228,16 @@ export const MENABUNG_VAULT_ABI = [
     name: 'Rebalanced',
     type: 'event',
     inputs: [{ name: 'user', type: 'address', indexed: true }],
+  },
+  {
+    name: 'PartialRebalance',
+    type: 'event',
+    inputs: [
+      { name: 'user', type: 'address', indexed: true },
+      { name: 'fromAdapter', type: 'address', indexed: true },
+      { name: 'toAdapter', type: 'address', indexed: true },
+      { name: 'amount', type: 'uint256', indexed: false },
+    ],
   },
 ] as const;
 
