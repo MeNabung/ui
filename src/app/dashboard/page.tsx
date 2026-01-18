@@ -544,12 +544,16 @@ export default function DashboardPage() {
   // Contract hooks - read real data when deployed
   const { data: idrxBalance } = useIDRXBalance(address);
   const { position, refetch: refetchPosition } = useUserPosition(address);
-  const { balance: vaultBalance, refetch: refetchBalance } = useUserTotalBalance(address);
-  const { breakdown, refetch: refetchBreakdown } = usePositionBreakdown(address);
+  const { balance: vaultBalance, refetch: refetchBalance } =
+    useUserTotalBalance(address);
+  const { breakdown, refetch: refetchBreakdown } =
+    usePositionBreakdown(address);
 
   // Rebalance state
-  const [selectedSuggestion, setSelectedSuggestion] = useState<RebalanceSuggestion | null>(null);
-  const [rebalanceAnalysis, setRebalanceAnalysis] = useState<RebalanceAnalysis | null>(null);
+  const [selectedSuggestion, setSelectedSuggestion] =
+    useState<RebalanceSuggestion | null>(null);
+  const [rebalanceAnalysis, setRebalanceAnalysis] =
+    useState<RebalanceAnalysis | null>(null);
   const [isRebalanceModalOpen, setIsRebalanceModalOpen] = useState(false);
 
   // Rebalance hooks
@@ -667,7 +671,7 @@ export default function DashboardPage() {
         },
         mockYields.yields,
         portfolioData.totalValue * 100, // Convert to IDRX with decimals
-        { riskProfile: getRiskProfile() }
+        { riskProfile: getRiskProfile() },
       );
       setRebalanceAnalysis(analysis);
     }
@@ -741,7 +745,7 @@ export default function DashboardPage() {
               </div>
               <div className="text-left sm:text-right">
                 <p className="text-xs sm:text-sm text-muted-foreground mb-0.5">
-                  Wallet IDRX
+                  Balance
                 </p>
                 <p className="text-base sm:text-lg font-semibold text-foreground tabular-nums">
                   {formattedIDRXBalance} IDRX
@@ -1092,7 +1096,9 @@ export default function DashboardPage() {
           <RebalanceModal
             suggestion={selectedSuggestion}
             analysis={rebalanceAnalysis}
-            totalValue={portfolioData?.totalValue ? portfolioData.totalValue * 100 : 0}
+            totalValue={
+              portfolioData?.totalValue ? portfolioData.totalValue * 100 : 0
+            }
             isOpen={isRebalanceModalOpen}
             onClose={() => {
               setIsRebalanceModalOpen(false);
