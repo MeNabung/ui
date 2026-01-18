@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { ReactNode } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { WagmiProvider } from 'wagmi';
-import { OnchainKitProvider } from '@coinbase/onchainkit';
-import { base } from 'wagmi/chains';
-import { wagmiConfig } from '@/lib/wagmi';
+import { ReactNode } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { WagmiProvider } from "wagmi";
+import { OnchainKitProvider } from "@coinbase/onchainkit";
+import { base } from "wagmi/chains";
+import { wagmiConfig } from "@/lib/wagmi";
 
 const queryClient = new QueryClient();
 
@@ -22,10 +22,13 @@ export function Providers({ children }: ProvidersProps) {
           chain={base}
           config={{
             appearance: {
-              name: 'MeNabung',
-              logo: '/images/logo.png',
-              mode: 'auto',
-              theme: 'default',
+              name: "MeNabung",
+              logo: "/images/logo.png",
+              mode: "auto",
+              theme: "default",
+            },
+            wallet: {
+              display: "modal",
             },
           }}
         >

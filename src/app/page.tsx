@@ -174,11 +174,7 @@ function ArrowRightIcon({ className }: { className?: string }) {
 
 function SparkleIcon({ className }: { className?: string }) {
   return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="currentColor"
-    >
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
       <path d="M12 0L13.5 8.5L22 10L13.5 11.5L12 20L10.5 11.5L2 10L10.5 8.5L12 0Z" />
     </svg>
   );
@@ -286,7 +282,7 @@ export default function Home() {
                 {/* Playful badge */}
                 <motion.div
                   className="inline-flex items-center gap-2 bg-gold/10 border-2 border-gold px-4 py-2 rounded-full"
-                  style={{ boxShadow: '3px 3px 0px var(--gold-dark)' }}
+                  style={{ boxShadow: "3px 3px 0px var(--gold-dark)" }}
                   whileHover={{ scale: 1.05, rotate: -2 }}
                 >
                   <SparkleIcon className="w-4 h-4 text-gold" />
@@ -296,17 +292,17 @@ export default function Home() {
                 </motion.div>
 
                 <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-teal-dark leading-[1.1] text-balance">
-                  Grow Your{" "}
-                  <span className="text-gold">IDRX</span>{" "}
-                  with{" "}
+                  Grow Your <span className="text-gold">IDRX</span> with{" "}
                   <span className="relative inline-block squiggle-underline">
                     AI-Powered
                   </span>{" "}
                   Savings
                 </h1>
                 <p className="text-lg sm:text-xl text-muted-foreground max-w-xl text-pretty">
-                  MeNabung is your smart DeFi savings advisor on <strong className="text-teal">Base</strong>.
-                  Get personalized strategies to maximize your IDRX returns through staking, liquidity pools, and options vaults.
+                  MeNabung is your smart DeFi savings advisor on{" "}
+                  <strong className="text-teal">Base</strong>. Get personalized
+                  strategies to maximize your IDRX returns through staking,
+                  liquidity pools, and options vaults.
                 </p>
               </motion.div>
 
@@ -320,8 +316,12 @@ export default function Home() {
                     <TrendingUpIcon className="w-5 h-5 text-teal" />
                   </div>
                   <div>
-                    <div className="text-xl font-bold text-teal-dark tabular-nums">4-15%</div>
-                    <div className="text-xs text-muted-foreground">APY Range</div>
+                    <div className="text-xl font-bold text-teal-dark tabular-nums">
+                      4-15%
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      APY Range
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -330,7 +330,9 @@ export default function Home() {
                   </div>
                   <div>
                     <div className="text-xl font-bold text-teal-dark">3</div>
-                    <div className="text-xs text-muted-foreground">DeFi Strategies</div>
+                    <div className="text-xs text-muted-foreground">
+                      DeFi Strategies
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -338,8 +340,12 @@ export default function Home() {
                     <ZapIcon className="w-5 h-5 text-terracotta" />
                   </div>
                   <div>
-                    <div className="text-xl font-bold text-teal-dark">Base L2</div>
-                    <div className="text-xs text-muted-foreground">Low Gas Fees</div>
+                    <div className="text-xl font-bold text-teal-dark">
+                      Base L2
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Low Gas Fees
+                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -351,7 +357,10 @@ export default function Home() {
               >
                 {isConnected ? (
                   <>
-                    <motion.div whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}>
+                    <motion.div
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
                       <Button
                         asChild
                         size="lg"
@@ -363,13 +372,16 @@ export default function Home() {
                         </Link>
                       </Button>
                     </motion.div>
-                    <motion.div whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}>
+                    <motion.div
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
                       <Button
                         asChild
                         variant="outline"
                         size="lg"
                         className="h-12 border-2 border-teal text-teal hover:bg-teal/5 btn-candy"
-                        style={{ boxShadow: '3px 3px 0px var(--teal-dark)' }}
+                        style={{ boxShadow: "3px 3px 0px var(--teal-dark)" }}
                       >
                         <Link href="/quiz">Take Risk Quiz</Link>
                       </Button>
@@ -428,13 +440,18 @@ export default function Home() {
                     <CardHeader className="pb-4">
                       <div className="flex items-center justify-between">
                         <WiggleOnHover>
-                          <div className="w-12 h-12 bg-teal rounded-xl flex items-center justify-center" style={{ boxShadow: '2px 2px 0px var(--teal-dark)' }}>
+                          <div
+                            className="w-12 h-12 bg-teal rounded-xl flex items-center justify-center"
+                            style={{
+                              boxShadow: "2px 2px 0px var(--teal-dark)",
+                            }}
+                          >
                             <SproutIcon className="w-6 h-6 text-white" />
                           </div>
                         </WiggleOnHover>
                         <motion.span
                           className="text-xs font-bold text-white bg-gold px-3 py-1.5 rounded-full"
-                          style={{ boxShadow: '2px 2px 0px var(--gold-dark)' }}
+                          style={{ boxShadow: "2px 2px 0px var(--gold-dark)" }}
                           animate={{ scale: [1, 1.05, 1] }}
                           transition={{ duration: 2, repeat: Infinity }}
                         >
@@ -456,7 +473,7 @@ export default function Home() {
                             Total Savings
                           </span>
                           <span className="text-2xl font-display font-bold text-teal-dark tabular-nums">
-                            0
+                            1,250,000
                           </span>
                         </div>
                         <div className="text-right text-sm text-muted-foreground font-medium">
@@ -509,16 +526,18 @@ export default function Home() {
                           whileHover={{ scale: 1.02, rotate: 1 }}
                         >
                           <div className="text-lg font-display font-bold text-teal tabular-nums">
-                            0
+                            +12,500
                           </div>
-                          <div className="text-xs font-medium text-muted-foreground">IDRX Earned</div>
+                          <div className="text-xs font-medium text-muted-foreground">
+                            IDRX Earned
+                          </div>
                         </motion.div>
                         <motion.div
                           className="text-center p-3 bg-gold/10 border-2 border-gold/30 rounded-xl"
                           whileHover={{ scale: 1.02, rotate: -1 }}
                         >
                           <div className="text-lg font-display font-bold text-gold tabular-nums">
-                            🔥 0
+                            🔥 7
                           </div>
                           <div className="text-xs font-medium text-muted-foreground">
                             Day Streak
@@ -561,7 +580,10 @@ export default function Home() {
         <div className="marquee">
           <div className="marquee-content">
             {[...marqueeItems, ...marqueeItems].map((item, i) => (
-              <div key={i} className="flex items-center gap-2 text-white font-semibold whitespace-nowrap">
+              <div
+                key={i}
+                className="flex items-center gap-2 text-white font-semibold whitespace-nowrap"
+              >
                 <item.Icon size={20} color="currentColor" strokeWidth={2} />
                 <span>{item.text}</span>
                 <span className="text-gold mx-4">•</span>
@@ -574,14 +596,26 @@ export default function Home() {
       {/* Features Section - Playful Cards */}
       <section className="py-24 bg-white relative overflow-hidden">
         <DotGridPattern className="opacity-30" />
-        <FloatingCircle size={150} color="teal" variant="outline" className="top-10 -left-20" delay={0} />
-        <FloatingSquare size={60} color="gold" rotate className="bottom-20 right-10" delay={1} />
+        <FloatingCircle
+          size={150}
+          color="teal"
+          variant="outline"
+          className="top-10 -left-20"
+          delay={0}
+        />
+        <FloatingSquare
+          size={60}
+          color="gold"
+          rotate
+          className="bottom-20 right-10"
+          delay={1}
+        />
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeUp className="text-center mb-16">
             <motion.div
               className="inline-flex items-center gap-2 bg-teal/10 border-2 border-teal px-4 py-2 rounded-full mb-6"
-              style={{ boxShadow: '3px 3px 0px var(--teal-dark)' }}
+              style={{ boxShadow: "3px 3px 0px var(--teal-dark)" }}
               whileHover={{ scale: 1.05, rotate: 2 }}
             >
               <span className="text-teal font-semibold text-sm">
@@ -592,7 +626,8 @@ export default function Home() {
               Smart Savings Made Simple
             </h2>
             <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-              Designed for Indonesian users who want to grow their IDRX with confidence
+              Designed for Indonesian users who want to grow their IDRX with
+              confidence
             </p>
           </FadeUp>
 
@@ -625,14 +660,25 @@ export default function Home() {
       {/* Strategies Section - NEW */}
       <section className="py-24 bg-cream relative overflow-hidden">
         <DotGridPattern />
-        <FloatingPlus size={30} color="terracotta" className="top-20 left-[10%]" delay={0} />
-        <FloatingCircle size={80} color="gold" variant="outline" className="bottom-20 right-[15%]" delay={1} />
+        <FloatingPlus
+          size={30}
+          color="terracotta"
+          className="top-20 left-[10%]"
+          delay={0}
+        />
+        <FloatingCircle
+          size={80}
+          color="gold"
+          variant="outline"
+          className="bottom-20 right-[15%]"
+          delay={1}
+        />
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeUp className="text-center mb-16">
             <motion.div
               className="inline-flex items-center gap-2 bg-terracotta/10 border-2 border-terracotta px-4 py-2 rounded-full mb-6"
-              style={{ boxShadow: '3px 3px 0px var(--terracotta)' }}
+              style={{ boxShadow: "3px 3px 0px var(--terracotta)" }}
               whileHover={{ scale: 1.05, rotate: -2 }}
             >
               <span className="text-terracotta font-semibold text-sm">
@@ -643,14 +689,21 @@ export default function Home() {
               Choose Your Risk Profile
             </h2>
             <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-              Our AI recommends the best allocation based on your goals and risk tolerance
+              Our AI recommends the best allocation based on your goals and risk
+              tolerance
             </p>
           </FadeUp>
 
           <BouncyStagger className="grid md:grid-cols-3 gap-6 lg:gap-8">
             <StrategyCard
               name="Conservative"
-              icon={<AnimatedShieldCheck size={32} color="var(--teal)" strokeWidth={2} />}
+              icon={
+                <AnimatedShieldCheck
+                  size={32}
+                  color="var(--teal)"
+                  strokeWidth={2}
+                />
+              }
               apy="4-6%"
               description="Prioritize capital preservation with stable staking rewards"
               allocation={[
@@ -662,7 +715,13 @@ export default function Home() {
             />
             <StrategyCard
               name="Balanced"
-              icon={<AnimatedFocusIcon size={32} color="var(--gold)" strokeWidth={2} />}
+              icon={
+                <AnimatedFocusIcon
+                  size={32}
+                  color="var(--gold)"
+                  strokeWidth={2}
+                />
+              }
               apy="6-10%"
               description="Mix of stability and growth for steady returns"
               allocation={[
@@ -675,7 +734,13 @@ export default function Home() {
             />
             <StrategyCard
               name="Aggressive"
-              icon={<AnimatedRocketIcon size={32} color="var(--terracotta)" strokeWidth={2} />}
+              icon={
+                <AnimatedRocketIcon
+                  size={32}
+                  color="var(--terracotta)"
+                  strokeWidth={2}
+                />
+              }
               apy="10-15%"
               description="Maximize returns with higher exposure to options vaults"
               allocation={[
@@ -692,14 +757,25 @@ export default function Home() {
       {/* How It Works Section */}
       <section className="py-24 bg-white relative overflow-hidden">
         <DotGridPattern className="opacity-20" />
-        <FloatingPlus size={30} color="gold" className="top-20 right-[20%]" delay={0} />
-        <FloatingCircle size={100} color="teal" variant="outline" className="bottom-10 left-10" delay={1.5} />
+        <FloatingPlus
+          size={30}
+          color="gold"
+          className="top-20 right-[20%]"
+          delay={0}
+        />
+        <FloatingCircle
+          size={100}
+          color="teal"
+          variant="outline"
+          className="bottom-10 left-10"
+          delay={1.5}
+        />
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeUp className="text-center mb-16">
             <motion.div
               className="inline-flex items-center gap-2 bg-gold/10 border-2 border-gold px-4 py-2 rounded-full mb-6"
-              style={{ boxShadow: '3px 3px 0px var(--gold-dark)' }}
+              style={{ boxShadow: "3px 3px 0px var(--gold-dark)" }}
               whileHover={{ scale: 1.05, rotate: -2 }}
             >
               <span className="text-gold font-semibold text-sm">
@@ -737,10 +813,32 @@ export default function Home() {
       {/* CTA Section - Playful */}
       <section className="py-24 bg-teal relative overflow-hidden">
         {/* Geometric decorations */}
-        <FloatingCircle size={200} color="gold" variant="outline" className="top-0 -right-20 opacity-20" delay={0} />
-        <FloatingSquare size={80} color="gold" className="-bottom-10 left-10 opacity-20" delay={1} />
-        <FloatingPlus size={40} color="gold" className="top-20 left-[30%] opacity-30" delay={2} />
-        <FloatingTriangle size={30} color="gold" direction="down" className="bottom-32 right-[20%] opacity-25" delay={1.5} />
+        <FloatingCircle
+          size={200}
+          color="gold"
+          variant="outline"
+          className="top-0 -right-20 opacity-20"
+          delay={0}
+        />
+        <FloatingSquare
+          size={80}
+          color="gold"
+          className="-bottom-10 left-10 opacity-20"
+          delay={1}
+        />
+        <FloatingPlus
+          size={40}
+          color="gold"
+          className="top-20 left-[30%] opacity-30"
+          delay={2}
+        />
+        <FloatingTriangle
+          size={30}
+          color="gold"
+          direction="down"
+          className="bottom-32 right-[20%] opacity-25"
+          delay={1.5}
+        />
 
         <FadeUp className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
@@ -748,17 +846,15 @@ export default function Home() {
             whileHover={{ scale: 1.05, rotate: 2 }}
           >
             <SparkleIcon className="w-4 h-4 text-gold" />
-            <span className="text-white font-semibold text-sm">
-              Start Now
-            </span>
+            <span className="text-white font-semibold text-sm">Start Now</span>
           </motion.div>
 
           <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6 text-balance">
             Ready to Grow Your IDRX?
           </h2>
           <p className="text-lg mb-10 max-w-xl mx-auto text-pretty text-white/90">
-            Join MeNabung and let AI help you build wealth with smart DeFi strategies.
-            Your keys, your crypto, your future.
+            Join MeNabung and let AI help you build wealth with smart DeFi
+            strategies. Your keys, your crypto, your future.
           </p>
           <motion.div
             className="inline-block"
@@ -780,7 +876,13 @@ export default function Home() {
               <Button
                 size="lg"
                 className="bg-white text-teal hover:bg-cream px-8 h-14 text-lg font-bold btn-candy btn-candy-light cursor-default"
-                onClick={() => document.querySelector<HTMLButtonElement>('[data-testid="ockConnectButton"]')?.click()}
+                onClick={() =>
+                  document
+                    .querySelector<HTMLButtonElement>(
+                      '[data-testid="ockConnectButton"]',
+                    )
+                    ?.click()
+                }
               >
                 Connect Wallet to Start
                 <ArrowRightIcon className="w-5 h-5 ml-2" />
@@ -820,7 +922,8 @@ export default function Home() {
           </div>
           <div className="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-white/10 text-center">
             <p className="text-xs sm:text-sm text-white/50">
-              {new Date().getFullYear()} MeNabung. Empowering Indonesian savers through decentralized finance.
+              {new Date().getFullYear()} MeNabung. Empowering Indonesian savers
+              through decentralized finance.
             </p>
           </div>
         </FadeUp>
@@ -834,27 +937,27 @@ function FeatureCard({
   icon,
   title,
   description,
-  color = 'teal',
+  color = "teal",
   delay = 0,
 }: {
   icon: React.ReactNode;
   title: string;
   description: string;
-  color?: 'teal' | 'gold' | 'terracotta';
+  color?: "teal" | "gold" | "terracotta";
   delay?: number;
 }) {
   const colorMap = {
     teal: {
-      bg: 'bg-teal',
-      shadow: 'var(--teal-dark)',
+      bg: "bg-teal",
+      shadow: "var(--teal-dark)",
     },
     gold: {
-      bg: 'bg-gold',
-      shadow: 'var(--gold-dark)',
+      bg: "bg-gold",
+      shadow: "var(--gold-dark)",
     },
     terracotta: {
-      bg: 'bg-terracotta',
-      shadow: 'var(--terracotta)',
+      bg: "bg-terracotta",
+      shadow: "var(--terracotta)",
     },
   };
 
@@ -915,14 +1018,16 @@ function StrategyCard({
         {featured && (
           <motion.div
             className="absolute -top-4 -right-4 bg-gold text-white text-xs font-bold px-3 py-1.5 rounded-full rotate-12"
-            style={{ boxShadow: '2px 2px 0px var(--gold-dark)' }}
+            style={{ boxShadow: "2px 2px 0px var(--gold-dark)" }}
             animate={{ rotate: [12, 15, 12] }}
             transition={{ duration: 2, repeat: Infinity }}
           >
             Popular
           </motion.div>
         )}
-        <Card className={`bg-white border-2 h-full ${featured ? 'border-gold shadow-hard-gold' : 'border-teal-dark card-playful'}`}>
+        <Card
+          className={`bg-white border-2 h-full ${featured ? "border-gold shadow-hard-gold" : "border-teal-dark card-playful"}`}
+        >
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               {icon}
@@ -941,7 +1046,7 @@ function StrategyCard({
               {allocation.map((item, i) => (
                 <motion.div
                   key={item.name}
-                  className={`${item.color} ${i === 0 ? 'rounded-l-full' : ''} ${i === allocation.length - 1 ? 'rounded-r-full' : ''}`}
+                  className={`${item.color} ${i === 0 ? "rounded-l-full" : ""} ${i === allocation.length - 1 ? "rounded-r-full" : ""}`}
                   initial={{ width: 0 }}
                   whileInView={{ width: `${item.pct}%` }}
                   viewport={{ once: true }}
@@ -954,7 +1059,9 @@ function StrategyCard({
               {allocation.map((item) => (
                 <div key={item.name} className="flex justify-between text-sm">
                   <span className="text-muted-foreground">{item.name}</span>
-                  <span className="font-semibold text-teal-dark">{item.pct}%</span>
+                  <span className="font-semibold text-teal-dark">
+                    {item.pct}%
+                  </span>
                 </div>
               ))}
             </div>
@@ -978,7 +1085,10 @@ function StepCard({
   description: string;
 }) {
   return (
-    <motion.div variants={bouncyFadeUpVariants} className="text-center space-y-4">
+    <motion.div
+      variants={bouncyFadeUpVariants}
+      className="text-center space-y-4"
+    >
       <div className="relative inline-flex">
         <motion.div
           className="w-20 h-20 bg-white border-2 border-teal-dark rounded-2xl flex items-center justify-center text-teal shadow-hard"
@@ -989,7 +1099,7 @@ function StepCard({
         </motion.div>
         <motion.div
           className="absolute -top-3 -right-3 w-8 h-8 bg-gold border-2 border-gold-dark rounded-full flex items-center justify-center"
-          style={{ boxShadow: '2px 2px 0px var(--gold-dark)' }}
+          style={{ boxShadow: "2px 2px 0px var(--gold-dark)" }}
           initial={{ scale: 0, rotate: -180 }}
           whileInView={{ scale: 1, rotate: 0 }}
           viewport={{ once: true }}
